@@ -34,13 +34,10 @@ string s_plus(string& a, string& b)
     int t, pool=0, ia=la-1, ib=lb-1;
     for (iter = 0; iter < la; iter++ )
     {
-        if (ib >= 0)
-            t = (a[ia]-'0') + (b[ib--]-'0') + pool;
-        else
-            t = (a[ia]-'0') + pool;
+        t = ib >= 0 ? (a[ia]-'0') + (b[ib--]-'0') + pool
+                    : (a[ia]-'0') + pool;
         s[ia--] = t%10 + '0', pool = t/10;
     }
-
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
     return s;
 }
