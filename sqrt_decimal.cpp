@@ -7,16 +7,100 @@
 using namespace std;
 
 string s_mp_single(const string& a, const string& b);
+string s_plus(const string& a, const string& b);
 string s_minus(string a, string b);
-int s_cmp( string &a, string &b );
+int s_cmp(const string &a, const string &b );
 void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
+    string num("29");
+    int len = num.length(), mod = len % 2, skip = 2 - mod;
+    string target = num.substr(0, skip);
+    string tnum = num.substr( skip );
     
-    
+    cout << target;
+    int mid, mp, mplen, est, cmp;
+    string s_mp;
+    string base("");
 
+    // dec loop
+    bool decloop = 1, estloop = 1;
+    int prec = 0,  base_len = 0, target_len = skip;
+
+    while ( decloop == 1 )
+    {   
+        //estimate
+        while ( estloop == 1 )
+        {
+            if ( s_cmp(target, base + "0") < 0 ) {
+                mid = 0, mp = 0, mplen = 0;
+                estloop = 0;
+                break;
+            }
+
+            if (base_len > 5) 
+                est = stoi(target.substr(0, 6)) / stoi(base.substr(0, 5));
+            else
+            {
+                for (int i=0; i < 10; i++)
+                {
+                    mp = (stoi(base + to_string(i) )) * i;
+                    if ( mp > stoi(target) ) {
+                        est = i-1;
+                        break;
+                    }
+                }
+            }
+
+            if ( est >= 10 ) {
+                if (target.length() > base.length() +1) est = 9;
+            }
+
+            mid = est;
+            s_mp = s_mp_single( base + to_string(mid), to_string(mid) );
+            cmp = s_cmp( s_mp, target );
+
+            if ( cmp > 0 ) {
+                cout << "what?";
+                mid -= 1;
+                s_mp = s_mp_single( base + to_string(mid), to_string(mid) );
+            }
+
+            break;
+        }
+
+        cout << mid;
+
+        target = s_minus(target, s_mp);
+        if ( skip > len )
+        {
+            target += "00";
+            prec += 1;
+            if (prec == 1) cout << ".";
+        }
+        else 
+        {
+            if ( s_cmp( target, "0" ) == 0 ) {
+                target = tnum.substr(0,2);
+            } else {
+                target += tnum.substr(0,2);
+            }
+            skip+=2;
+        }
+        target_len+=2;
+
+        if ( s_cmp(base, "0") == 0 ) {
+            base = to_string(mid*2), base_len = mid*2 >= 10 ? 2 : 1;
+        } else {
+            base = s_plus( base + "0", to_string(mid*2) );
+            base_len = base.length();
+        }
+
+
+        //break;
+    }
 
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
@@ -43,17 +127,16 @@ string s_mp_single(const string& a, const string& b)
 }
 
 // plus 属于标准库函数的名称，所以加了前缀
-string s_plus(string& a, string& b)
+string s_plus(const string& a, const string& b)
 {
-    static int iter;
+    static int ia;
     string s( a.length(), '0');
-    int la = a.length(), lb = b.length();
-    int t, pool=0, ia=la-1, ib=lb-1;
-    for (iter = 0; iter < la; iter++ )
+    int t, pool=0, ib=b.length()-1;
+    for (ia = a.length()-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (a[ia]-'0') + (b[ib--]-'0') + pool
                     : (a[ia]-'0') + pool;
-        s[ia--] = t%10 + '0', pool = t/10;
+        s[ia] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
     return s;
@@ -84,7 +167,7 @@ string s_minus(string va, string vb)
 }
 
 
-int s_cmp( string &a, string &b )
+int s_cmp(const string &a, const string &b )
 {
     if ( a.length() > b.length() ) return 1;
     else if ( a.length() < b.length() ) return -1;
