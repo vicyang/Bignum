@@ -6,8 +6,8 @@
 #include <chrono>
 using namespace std;
 
-string s_mp_single(string& a, string& b);
-string s_mp_int(string& a, int b);
+string s_mp_single(const string& a, const string& b);
+string s_mp_int(const string& a, int b);
 void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[] )
 }
 
 // bignum * single num (str * int)
-string s_mp_int(string& a, int b)
+string s_mp_int(const string& a, int b)
 {
     static int idx;
     string s;
@@ -51,7 +51,7 @@ string s_mp_int(string& a, int b)
 }
 
 // bignum * single num (str*str)
-string s_mp_single(string& a, string& b)
+string s_mp_single(const string& a, const string& b)
 {
     static int idx;
     string s;
