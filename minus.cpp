@@ -19,14 +19,14 @@ int main(int argc, char *argv[] )
 
     //其他测试 1
     a="9999", b="19999";
-    c = s_minus( b, a );
-    //check(a, b);
-    cout << c << endl;
 
     c = s_minus( a, b );
-    //check(a, b);
+    check(a, b);
     cout << c << endl;
-
+    
+    c = s_minus( b, a );
+    check(a, b);
+    cout << c << endl;
 
     cout << "Time Used: " << diff.count() << " s" << endl;
     return 0;
@@ -36,13 +36,13 @@ int main(int argc, char *argv[] )
 string s_minus(string& a, string& b)
 {
     static int ia;
-    string s( a.length(), '0');
     int cmp = s_cmp(a, b);
     if (cmp == 0) return "0";
-    else if (cmp == -1) swap(a, b);
+    else if (cmp == -1) swap( a, b );
     cout << "a:" << a << "b:" << b << endl;
     cout << "la:" << a.length() << "lb:" << b.length() << endl;
 
+    string s( a.length(), '0');
     int t, cut=0, ib=b.length()-1, zero=0;
     for (ia = a.length()-1; ia >= 0; ia-- )
     {
