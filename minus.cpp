@@ -28,19 +28,16 @@ int main(int argc, char *argv[] )
 // 大数减法 字符串操作, 暂时假设 a > b
 string s_minus(string& a, string& b)
 {
-    static int iter;
+    static int ia;
     string s( a.length(), '0');
     int la = a.length(), lb = b.length();
-    int t, cut=0, ia=la-1, ib=lb-1;
-    for (iter = 0; iter < la; iter++ )
+    int t, cut=0, ib=lb-1;
+    for (ia = la-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (a[ia]-'0') - (b[ib--]-'0') - cut 
                     : (a[ia]-'0') - cut;
-        if (t < 0)
-            s[ia] = 10+t+'0', cut = 1;
-        else 
-            s[ia] = t + '0', cut = 0;
-        ia--;
+        cut = t < 0 ? 1 : 0;
+        s[ia] = t + '0' + cut*10;
     }
 
     return s;
