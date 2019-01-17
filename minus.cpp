@@ -9,8 +9,8 @@ void check(string a, string b);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    string a(10000, '9');
-    string b(10000, '8');
+    string a(10000, '8');
+    string b(10000, '9');
     string c;
     //耗时测试
     for (int i = 0; i < 1000; i++) s_minus(a, b);
@@ -19,11 +19,12 @@ int main(int argc, char *argv[] )
 
     //其他测试 1
     a="9999", b="19999";
+    cout << "before a=" << a << ", b=" << b << endl;
 
     c = s_minus( a, b );
     check(a, b);
     cout << c << endl;
-    cout << "a:" << a << "b:" << b << endl;
+    cout << "after a=" << a << ", b=" << b << endl;
     c = s_minus( b, a );
     check(a, b);
     cout << c << endl;
@@ -33,6 +34,7 @@ int main(int argc, char *argv[] )
 }
 
 // 大数减法 字符串操作, 暂时假设 a >= b
+// 传参使用副本拷贝，避免调换原数值
 string s_minus(string va, string vb)
 {
     static int ia;
