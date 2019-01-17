@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+#include <chrono>
 using namespace std;
 
 string s_plus(string a, string b);
@@ -7,19 +7,24 @@ void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
 {
-    string a="9999999990123456";
-    string b="123456789";
+    auto start = chrono::system_clock::now();
+    string a(10000, '9');
+    string b(10000, '9');
     string c=s_plus(a, b);
     //check(a, b);
-    cout<<c<<endl;
+    for (int i = 0; i < 10000; i++) s_plus(a, b);
+    auto end = chrono::system_clock::now();
+    chrono::duration<double> diff = end-start;
+    //cout<<c<<endl;
+    cout << "Time Used: " << diff.count() << " s" << endl;
+    
     return 0;
 }
 
 // plus 属于标准库函数的名称，所以加了前缀
 string s_plus(string a, string b)
 {
-    string s(a.length(), '0');
-
+    string s( a.length(), '0');
     int la = a.length(), lb = b.length();
     int t, pool = 0, ia, ib, ic;
     for (int iter = 0; iter < la; iter++ )
