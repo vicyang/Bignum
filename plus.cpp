@@ -28,15 +28,14 @@ int main(int argc, char *argv[] )
 // plus 属于标准库函数的名称，所以加了前缀
 string s_plus(string& a, string& b)
 {
-    static int iter;
+    static int ia;
     string s( a.length(), '0');
-    int la = a.length(), lb = b.length();
-    int t, pool=0, ia=la-1, ib=lb-1;
-    for (iter = 0; iter < la; iter++ )
+    int t, pool=0, ib=b.length()-1;
+    for (ia = a.length()-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (a[ia]-'0') + (b[ib--]-'0') + pool
                     : (a[ia]-'0') + pool;
-        s[ia--] = t%10 + '0', pool = t/10;
+        s[ia] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
     return s;
