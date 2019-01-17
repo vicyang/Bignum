@@ -2,7 +2,7 @@
 #include <chrono>
 using namespace std;
 
-string s_plus(string& a, string& b);
+string s_plus(const string& a, const string& b);
 void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[] )
 }
 
 // plus 属于标准库函数的名称，所以加了前缀
-string s_plus(string& a, string& b)
+string s_plus(const string& a, const string& b)
 {
     static int ia;
     string s( a.length(), '0');
