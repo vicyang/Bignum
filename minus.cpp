@@ -2,7 +2,7 @@
 #include <chrono>
 using namespace std;
 
-string s_minus(string& a, string& b);
+string s_minus(string a, string b);
 int s_cmp( string &a, string &b );
 void check(string a, string b);
 
@@ -13,7 +13,7 @@ int main(int argc, char *argv[] )
     string b(10000, '8');
     string c;
     //耗时测试
-    //for (int i = 0; i < 1000; i++) s_minus(a, b);
+    for (int i = 0; i < 1000; i++) s_minus(a, b);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
 
@@ -33,12 +33,14 @@ int main(int argc, char *argv[] )
 }
 
 // 大数减法 字符串操作, 暂时假设 a >= b
-string s_minus(string& a, string& b)
+string s_minus(string va, string vb)
 {
     static int ia;
+    string &a = va, &b = vb;
     int cmp = s_cmp(a, b);
     if (cmp == 0) return "0";
-    else if (cmp == -1) swap( a, b );
+    else if (cmp == -1) swap(a, b);
+
     string s( a.length(), '0');
     int t, cut=0, ib=b.length()-1, zero=0;
     for (ia = a.length()-1; ia >= 0; ia-- )
