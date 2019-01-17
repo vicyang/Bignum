@@ -20,9 +20,7 @@ int main(int argc, char *argv[] )
     for (int i = 0; i < 1000; i++) s_mp_single(a, b);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
-
-    c = s_mp_int( a, n );
-
+    
     //其他测试
     a="999999";
     b="9";
