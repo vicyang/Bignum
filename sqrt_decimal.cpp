@@ -2,6 +2,7 @@
 // 523066680/vicyang
 // 2019-01
 
+#include <cstdio>
 #include <iostream>
 #include <chrono>
 using namespace std;
@@ -15,12 +16,12 @@ void check(string a, string b);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    string num("29");
+    string num("2");
     int len = num.length(), mod = len % 2, skip = 2 - mod;
     string target = num.substr(0, skip);
     string tnum = num.substr( skip );
     
-    cout << target;
+    //cout << target;
     int mid, mp, mplen, est, cmp;
     string s_mp;
     string base("");
@@ -29,7 +30,8 @@ int main(int argc, char *argv[] )
     bool decloop = 1, estloop = 1;
     int prec = 0,  base_len = 0, target_len = skip;
 
-    while ( decloop == 1 )
+    int count = 1;
+    while ( decloop == 1  )
     {   
         //estimate
         while ( estloop == 1 )
@@ -71,7 +73,14 @@ int main(int argc, char *argv[] )
             break;
         }
 
-        cout << mid;
+        //cout << mid << endl;
+        printf("mp %d, s_mp %s tg %s\n", mp, s_mp.c_str(), target.c_str() );
+
+        if (tnum.length() == 0 )
+        {
+            if ( s_cmp(target, "00") == 0 ) break;
+            if ( cmp == 0 ) break;
+        }
 
         target = s_minus(target, s_mp);
         if ( skip > len )
@@ -98,8 +107,7 @@ int main(int argc, char *argv[] )
             base_len = base.length();
         }
 
-
-        //break;
+        if ( count ++ > 6) break;
     }
 
     auto end = chrono::system_clock::now();
