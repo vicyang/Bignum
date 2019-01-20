@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <vector>
 #include <chrono>
 using namespace std;
 
@@ -11,113 +12,113 @@ string s_mp_single(const string& a, const string& b);
 string s_plus(const string& a, const string& b);
 string s_minus(const string& a, const string& b);
 int s_cmp(const string &a, const string &b );
+string sqrt_decimal(const string &num, int precision);
 void check(string a, string b);
+static vector<int> ctoi(256);
+
+// void init(void) {
+//     for (int i = 0; i < 10; i++ ) ctoi[i+'0'] = i;
+// }
 
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    string num("22");
+    sqrt_decimal("40", 100);
+    auto end = chrono::system_clock::now();
+    chrono::duration<double> diff = end-start;
+    cout << "Time Used: " << diff.count() << " s" << endl;
+    return 0;
+}
+
+string sqrt_decimal(const string &num, int precision)
+{
+    static string itoc("0123456789");
+    static vector<string> itos{"0","1","2","3","4","5","6","7","8","9"};
     int len = num.length(), mod = len % 2, skip = 2 - mod;
     string target = num.substr(0, skip);
-    string tnum = num.substr( skip );
-    
-    //cout << target;
-    int mid, mp, mplen, est, cmp;
-    string s_mp;
+    string tnum = num.substr(skip);
+
+    bool dec_loop = 1;
+    int prec = 0, est, mp, mid, cmp;
     string base("");
 
-    // dec loop
-    bool decloop = 1, estloop = 1;
-    int prec = 0,  base_len = 0, target_len = skip;
+    string s_mp;
 
-    int count = 1;
-    while ( decloop == 1 && prec < 10 )
-    {   
-        //estimate
-        while ( estloop == 1 )
-        {
-            if ( s_cmp(target, base + "0") < 0 ) {
-                mid = 0, mp = 0, mplen = 0;
-                est = 0;
-                s_mp = "0";
-                break;
-            }
-
-            if (base_len > 5) 
+    while (dec_loop && prec < precision )
+    {
+        if ( s_cmp(target, base + "0") < 0 ) {
+            mid = 0, est = 0, s_mp = "0";
+        } else {
+            //评估下一个数字（est）
+            if ( base.length() > 5 )
+            {
                 est = stoi(target.substr(0, 6)) / stoi(base.substr(0, 5));
+            }
             else
             {
-                for (int i=0; i < 10; i++)
+                est = 9;  // 如果遍历0-9均没有超越target，est取值为9
+                for (int i = 0; i <= 9; i++ )
                 {
-                    mp = (stoi(base + to_string(i) )) * i;
+                    mp = stoi(base+itoc[i]) * i;
                     if ( mp > stoi(target) ) {
                         est = i-1;
                         break;
                     }
                 }
             }
-
-            if ( est >= 10 ) {
-                if ( target.length() > (base.length()+1) )
-                    est = 9;
-                else
-                    est /= 10;
-            }
-
-            mid = est;
-            s_mp = s_mp_single( base + to_string(mid), to_string(mid) );
-            cmp = s_cmp( s_mp, target );
-
-            if ( cmp > 0 ) {
-                //cout << "what?";
-                mid -= 1;
-                s_mp = s_mp_single( base + to_string(mid), to_string(mid) );
-            }
-
-            break;
         }
 
+        //如果估值大于10，考虑取9还是取首位数
+        if ( est >= 10 ) 
+            est = target.length() > (base.length()+1) ? 9 : est/10;
+
+        mid = est;
+        s_mp = s_mp_single( base+itoc[mid], itos[mid] );
+        cmp = s_cmp( s_mp, target );
+
+        //如果 最后乘出来的结果大于 target
+        if ( cmp > 0 ) {
+            //cout << "what?";
+            mid -= 1;
+            s_mp = s_mp_single( base+itoc[mid], itos[mid] );
+        }
+        
         cout << mid;
-        printf("base %s, mid %d, s_mp %s, tg %s, \n", base.c_str(), mid, s_mp.c_str(), target.c_str() );
+        printf(" est %d, tg %16s, base, %s, s_mp %s, \n", est, target.c_str(), base.c_str(), s_mp.c_str());
 
-        if (tnum.length() == 0 )
-        {
-            if ( s_cmp(target, "00") == 0 ) break;
+        if (tnum.length() == 0 ) {
+            if ( target.compare("00") == 0 ) break;
             if ( cmp == 0 ) break;
-        }
 
-        target = s_minus(target, s_mp);
-        if ( skip >= len )
-        {
+            // 更新 target 值
+            target = s_minus(target, s_mp);
             target += "00";
             prec += 1;
             if (prec == 1) cout << ".";
-        }
-        else 
-        {
-            if ( s_cmp( target, "0" ) == 0 ) {
+        } else {
+            if ( target.compare("0") == 0 ) {
                 target = tnum.substr(0,2);
-                tnum = tnum.substr(2);
             } else {
                 target += tnum.substr(0,2);
-                tnum = tnum.substr(2);
             }
-            skip+=2;
+            tnum = tnum.substr(2);
         }
-        target_len+=2;
 
-        if ( s_cmp(base, "0") == 0 ) {
-            base = to_string(mid*2), base_len = mid*2 >= 10 ? 2 : 1;
+        //更新 base 基数
+        if ( base.compare("0") == 0 ) {
+            base = to_string(mid*2);
         } else {
-            base = s_plus( base + "0", to_string(mid*2) );
-            base_len = base.length();
-        }
-    }
+            base = s_plus( base + "0", to_string( mid*2 ) );
 
-    auto end = chrono::system_clock::now();
-    chrono::duration<double> diff = end-start;
-    cout << "Time Used: " << diff.count() << " s" << endl;
-    return 0;
+            s_plus("0", "12" );
+            cout << base;
+            break;
+        }
+        
+    }
+    cout << endl;
+
+    return "";
 }
 
 // bignum * single num (str*str)
