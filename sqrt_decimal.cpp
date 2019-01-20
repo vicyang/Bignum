@@ -23,7 +23,7 @@ static vector<int> ctoi(256);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    sqrt_decimal("40", 100);
+    sqrt_decimal("100", 100);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
     cout << "Time Used: " << diff.count() << " s" << endl;
