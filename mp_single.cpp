@@ -13,11 +13,11 @@ void check(string a, string b);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    string a(10000, '9');
+    string a(10000000, '9');
     string b("9");
     string c=s_mp_single(a, b);
     // //耗时测试
-    for (int i = 0; i < 1000; i++) s_mp_single(a, b);
+    //for (int i = 0; i < 10; i++) s_mp_single(a, b);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
     
@@ -26,8 +26,8 @@ int main(int argc, char *argv[] )
     b="9";
     int n = stoi(b);
     c = s_mp_int( a, n );
-    check(a, b);
-    cout << c << endl;
+    //check(a, b);
+    //cout << c << endl;
     cout << "Time Used: " << diff.count() << " s" << endl;
     return 0;
 }
