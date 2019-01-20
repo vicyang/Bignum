@@ -23,7 +23,7 @@ static vector<int> ctoi(256);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    sqrt_decimal("100", 100);
+    sqrt_decimal("12345678987654321", 10000);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
     cout << "Time Used: " << diff.count() << " s" << endl;
@@ -51,19 +51,14 @@ string sqrt_decimal(const string &num, int precision)
         } else {
             //评估下一个数字（est）
             if ( base.length() > 5 )
-            {
                 est = stoi(target.substr(0, 6)) / stoi(base.substr(0, 5));
-            }
             else
             {
                 est = 9;  // 如果遍历0-9均没有超越target，est取值为9
                 for (int i = 0; i <= 9; i++ )
                 {
                     mp = stoi(base+itoc[i]) * i;
-                    if ( mp > stoi(target) ) {
-                        est = i-1;
-                        break;
-                    }
+                    if ( mp > stoi(target) ) { est = i-1; break; }
                 }
             }
         }
@@ -84,20 +79,21 @@ string sqrt_decimal(const string &num, int precision)
         }
         
         cout << mid;
-        printf(" est %d, tg %16s, base, %s, s_mp %s, \n", est, target.c_str(), base.c_str(), s_mp.c_str());
+        //printf(" est %d, tg %16s, base, %s, s_mp %s, \n", est, target.c_str(), base.c_str(), s_mp.c_str());
 
+        // 更新 target 值
+        target = s_minus(target, s_mp);
         if (tnum.length() == 0 ) {
-            if ( target.compare("00") == 0 ) break;
+            //if ( target.compare("00") == 0 ) break;
+            if ( target.compare("0") == 0 ) break;
             if ( cmp == 0 ) break;
-
-            // 更新 target 值
-            target = s_minus(target, s_mp);
             target += "00";
             prec += 1;
             if (prec == 1) cout << ".";
         } else {
             if ( target.compare("0") == 0 ) {
                 target = tnum.substr(0,2);
+                if ( target[0] == '0' ) target.erase(0,1);
             } else {
                 target += tnum.substr(0,2);
             }
@@ -114,7 +110,6 @@ string sqrt_decimal(const string &num, int precision)
         
     }
     cout << endl;
-
     return "";
 }
 
@@ -157,6 +152,7 @@ string s_plus(const string& a, const string& b)
 string s_minus(const string& a, const string& b)
 {
     static int ia;
+    if ( a.compare(b) == 0 ) return "0";
     string s( a.length(), '0');
     int t, cut=0, ib=b.length()-1, zero=0;
     for (ia = a.length()-1; ia >= 0; ia-- )
