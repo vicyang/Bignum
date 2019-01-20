@@ -104,15 +104,12 @@ string sqrt_decimal(const string &num, int precision)
             tnum = tnum.substr(2);
         }
 
-        //更新 base 基数
-        if ( base.compare("0") == 0 ) {
+        //更新 base - 基数
+        if ( base.length() == 0 ) {
             base = to_string(mid*2);
         } else {
+            // mid*2 有可能是两位数，确保base至少有1位
             base = s_plus( base + "0", to_string( mid*2 ) );
-
-            s_plus("0", "12" );
-            cout << base;
-            break;
         }
         
     }
@@ -140,6 +137,7 @@ string s_mp_single(const string& a, const string& b)
 }
 
 // plus 属于标准库函数的名称，所以加了前缀
+// 调用前应确认a的长度大于b
 string s_plus(const string& a, const string& b)
 {
     static int ia;
