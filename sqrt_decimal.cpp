@@ -9,14 +9,14 @@ using namespace std;
 
 string s_mp_single(const string& a, const string& b);
 string s_plus(const string& a, const string& b);
-string s_minus(string a, string b);
+string s_minus(const string& a, const string& b);
 int s_cmp(const string &a, const string &b );
 void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    string num("2");
+    string num("22");
     int len = num.length(), mod = len % 2, skip = 2 - mod;
     string target = num.substr(0, skip);
     string tnum = num.substr( skip );
@@ -31,14 +31,15 @@ int main(int argc, char *argv[] )
     int prec = 0,  base_len = 0, target_len = skip;
 
     int count = 1;
-    while ( decloop == 1  )
+    while ( decloop == 1 && prec < 10 )
     {   
         //estimate
         while ( estloop == 1 )
         {
             if ( s_cmp(target, base + "0") < 0 ) {
                 mid = 0, mp = 0, mplen = 0;
-                estloop = 0;
+                est = 0;
+                s_mp = "0";
                 break;
             }
 
@@ -57,7 +58,10 @@ int main(int argc, char *argv[] )
             }
 
             if ( est >= 10 ) {
-                if (target.length() > base.length() +1) est = 9;
+                if ( target.length() > (base.length()+1) )
+                    est = 9;
+                else
+                    est /= 10;
             }
 
             mid = est;
@@ -65,7 +69,7 @@ int main(int argc, char *argv[] )
             cmp = s_cmp( s_mp, target );
 
             if ( cmp > 0 ) {
-                cout << "what?";
+                //cout << "what?";
                 mid -= 1;
                 s_mp = s_mp_single( base + to_string(mid), to_string(mid) );
             }
@@ -73,8 +77,8 @@ int main(int argc, char *argv[] )
             break;
         }
 
-        //cout << mid << endl;
-        printf("mp %d, s_mp %s tg %s\n", mp, s_mp.c_str(), target.c_str() );
+        cout << mid;
+        printf("base %s, mid %d, s_mp %s, tg %s, \n", base.c_str(), mid, s_mp.c_str(), target.c_str() );
 
         if (tnum.length() == 0 )
         {
@@ -83,7 +87,7 @@ int main(int argc, char *argv[] )
         }
 
         target = s_minus(target, s_mp);
-        if ( skip > len )
+        if ( skip >= len )
         {
             target += "00";
             prec += 1;
@@ -93,8 +97,10 @@ int main(int argc, char *argv[] )
         {
             if ( s_cmp( target, "0" ) == 0 ) {
                 target = tnum.substr(0,2);
+                tnum = tnum.substr(2);
             } else {
                 target += tnum.substr(0,2);
+                tnum = tnum.substr(2);
             }
             skip+=2;
         }
@@ -106,8 +112,6 @@ int main(int argc, char *argv[] )
             base = s_plus( base + "0", to_string(mid*2) );
             base_len = base.length();
         }
-
-        if ( count ++ > 6) break;
     }
 
     auto end = chrono::system_clock::now();
@@ -151,15 +155,9 @@ string s_plus(const string& a, const string& b)
 }
 
 // 大数减法 字符串操作, 暂时假设 a >= b
-// 传参使用副本拷贝，避免调换原数值
-string s_minus(string va, string vb)
+string s_minus(const string& a, const string& b)
 {
     static int ia;
-    string &a = va, &b = vb;
-    int cmp = s_cmp(a, b);
-    if (cmp == 0) return "0";
-    else if (cmp == -1) swap(a, b);
-
     string s( a.length(), '0');
     int t, cut=0, ib=b.length()-1, zero=0;
     for (ia = a.length()-1; ia >= 0; ia-- )
