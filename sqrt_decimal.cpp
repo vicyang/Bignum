@@ -24,7 +24,7 @@ static vector<int> ctoi(256);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    sqrt_decimal("2", 20000);
+    sqrt_decimal("2", 10000);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
     cout << "Time Used: " << diff.count() << " s" << endl;
@@ -130,10 +130,10 @@ string s_mp_single(const string& a, const string& b)
     if ( b[0] == '0' ) return "0";
     if ( b[0] == '1' ) return a;
     s.assign(a.length(), '0');
-    int t, pool = 0;
+    int t, pool = 0, numb = b[0]-'0';
     for ( idx = a.length()-1; idx >= 0; idx-- )
     {
-        t = (a[idx]-'0') * (b[0] - '0') + pool;
+        t = (a[idx]-'0') * numb + pool;
         s[idx] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
