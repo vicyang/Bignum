@@ -24,7 +24,7 @@ static vector<int> ctoi(256);
 int main(int argc, char *argv[] ) 
 {
     auto start = chrono::system_clock::now();
-    sqrt_decimal("12345678987654321", 10000);
+    sqrt_decimal("2", 20000);
     auto end = chrono::system_clock::now();
     chrono::duration<double> diff = end-start;
     cout << "Time Used: " << diff.count() << " s" << endl;
@@ -40,7 +40,7 @@ string sqrt_decimal(const string &num, int precision)
     string tnum = num.substr(skip);
 
     bool dec_loop = 1;
-    int prec = 0, est, mp, mid, cmp;
+    int prec = 0, est, mp, mid, cmp, dbmid;
     string base("");
 
     string s_mp;
@@ -105,8 +105,15 @@ string sqrt_decimal(const string &num, int precision)
         if ( base.length() == 0 ) {
             base = to_string(mid*2);
         } else {
-            // mid*2 有可能是两位数，确保base至少有1位
-            base = s_plus( base + "0", to_string( mid*2 ) );
+            // mid*2 有可能是两位数，确保base至少有1位（s_plus假设a长度大于等于b）
+            dbmid = mid*2;
+            if (dbmid > 9)
+                if ( base.back() < '9' )
+                    base.back() += 1, base += (dbmid-10)+'0';
+                else
+                    base = s_plus( base + "0", to_string(dbmid) );
+            else
+                base += dbmid+'0';
         }
         
     }
@@ -121,6 +128,7 @@ string s_mp_single(const string& a, const string& b)
     string s;
     //如果b是0，直接返回0
     if ( b[0] == '0' ) return "0";
+    if ( b[0] == '1' ) return a;
     s.assign(a.length(), '0');
     int t, pool = 0;
     for ( idx = a.length()-1; idx >= 0; idx-- )
@@ -167,7 +175,6 @@ string s_minus(const string& a, const string& b)
     if (zero > 0) s.erase(0, zero);
     return s;
 }
-
 
 int s_cmp(const string &a, const string &b )
 {
