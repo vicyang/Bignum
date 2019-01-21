@@ -12,20 +12,37 @@ void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
 {
-    auto start = chrono::system_clock::now();
+    auto stage0 = chrono::system_clock::now();
     chrono::duration<double> diff;
     string a(10000, '8');
     string b(10000, '9');
-    char* ch_a = (char *)malloc( 10000 * sizeof(char) );
-    char* ch_b = (char *)malloc( 10000 * sizeof(char) );
-    memset(ch_a, '9', 10000);
-    memset(ch_b, '8', 10000);
+    char* ch_a = (char *)malloc( 10001 * sizeof(char) );
+    char* ch_b = (char *)malloc( 10001 * sizeof(char) );
+    int len_a = 10000, len_b = 10000;
+    memset(ch_a, '9', len_a );
+    memset(ch_b, '8', len_b );
+    ch_a[len_a] = '\0';
+    ch_b[len_b] = '\0';
+    printf("len_a %d, len_b: %d\n", strlen( ch_a ), strlen( ch_b ) );
 
     string c;
     //耗时测试
-    for (int i = 0; i < 10000; i++) s_minus(a, b);
-    auto end = chrono::system_clock::now();
-    diff = end-start;
+    for (int i = 0; i < 50000; i++) s_minus(a, b);
+    auto stage1 = chrono::system_clock::now();
+    diff = stage1-stage0;
+    printf("Stage1, Time used: %f\n", diff.count());
+
+    char* ch_c = c_minus(ch_a, ch_b);
+    //printf("%s\n", ch_c);
+    printf("%d\n", strlen(ch_c) );
+
+    //测试 c_minus 性能
+    {
+        for (int i = 0; i < 50000; i++) c_minus(ch_a, ch_b);
+        auto stage2 = chrono::system_clock::now();
+        diff = stage2-stage1;
+        printf("Stage2, Time used: %f\n", diff.count());
+    }
 
     //其他测试 1
     {
@@ -38,15 +55,21 @@ int main(int argc, char *argv[] )
         // check(a, b);
     }
 
-    cout << "Time Used: " << diff.count() << " s" << endl;
     return 0;
 }
 
 char* c_minus(char* a, char* b)
 {
     static int ia;
-    char* c = (char *)malloc( 10000 * sizeof(char) );
-    int la = strlen(a), lb = strlen(b);
+    int la = strlen(a), lb = strlen(b), tl;
+    char* tp;
+    //如果 la < lb， 调换
+    if ( la < lb )
+        tp = a, a = b, b = tp, tl = la, la = lb, lb = tl;
+    else if ( la == lb && strcmp(a,b) < 0 )
+        tp = a, a = b, b = tp, tl = la, la = lb, lb = tl;
+
+    char* c = (char *)malloc( strlen(a) * sizeof(char) );
 
     int t, cut=0, ib=lb-1, zero=0;
     for (ia = la-1; ia >= 0; ia-- )
