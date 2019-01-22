@@ -12,23 +12,34 @@ void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
 {
-    auto start = chrono::system_clock::now();
+    chrono::duration<double> diff;
+    auto stage0 = chrono::system_clock::now();
     string a(10000000, '9');
     string b("9");
-    string c=s_mp_single(a, b);
-    // //耗时测试
-    //for (int i = 0; i < 10; i++) s_mp_single(a, b);
-    auto end = chrono::system_clock::now();
-    chrono::duration<double> diff = end-start;
-    
-    //其他测试
-    a="999999";
-    b="9";
-    int n = stoi(b);
+    string c;
+    // 耗时测试 1
+    {
+        for (int i = 0; i < 10; i++) s_mp_single(a, b);
+        diff = chrono::system_clock::now()-stage0;
+        cout << "Time Used: " << diff.count() << " s" << endl;
+    }
+
+    auto stage1 = chrono::system_clock::now();
+    int n;
+    // 耗时测试 2
+    {
+        n = stoi(b);
+        for (int i = 0; i < 10; i++) s_mp_int(a, n);
+        diff = chrono::system_clock::now()-stage1;
+        cout << "Time Used: " << diff.count() << " s" << endl;
+    }
+
+    // 其他测试
+    a="999";
     c = s_mp_int( a, n );
     //check(a, b);
     //cout << c << endl;
-    cout << "Time Used: " << diff.count() << " s" << endl;
+    
     return 0;
 }
 
