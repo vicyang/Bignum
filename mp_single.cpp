@@ -69,10 +69,10 @@ string s_mp_single(const string& a, const string& b)
     //如果b是0，直接返回0
     if ( b[0] == '0' ) return "0";
     s.assign(a.length(), '0');
-    int t, pool = 0;
+    int t, pool = 0, numb = b[0] - '0';
     for ( idx = a.length()-1; idx >= 0; idx-- )
     {
-        t = (a[idx]-'0') * (b[0] - '0') + pool;
+        t = (a[idx]-'0') * numb + pool;
         s[idx] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
