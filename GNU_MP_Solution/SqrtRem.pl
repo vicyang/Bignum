@@ -5,7 +5,7 @@ print "$s $r\n";
 my ($q, $u) = DivRem(11, 3);
 print "$q $u\n";
 
-($s,$r) = SqrtRem("12345678987654321234234234234324");
+($s,$r) = SqrtRem("12345678987654321");
 printf "%d %d\n", $s, $r;
 
 sub SqrtRem
@@ -28,7 +28,9 @@ sub SqrtRem
     $S = $s*10**$e + $q;
     $R = $u*10**$e + $A[0] - $q*$q;
 
-    #printf "%d %d\n", $s, $r;
+    printf "s: %d, r: $u\n", $s, $r;
+    printf "q: %d, u: $u\n", $q, $u;
+    printf "S: %d, R: $u\n", $S, $R;
     if ($R < 0) {
         $R = $R + $S*2 - 1, $S -= 1;
     }
