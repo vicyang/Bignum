@@ -14,27 +14,30 @@ string s_plus(const string& a, const string& b);
 string s_minus(const string& a, const string& b);
 int s_cmp(const string &a, const string &b );
 string sqrt_decimal(const string &num, int precision);
-void check(string a, string b);
-static vector<int> ctoi(256);
 
-// void init(void) {
-//     for (int i = 0; i < 10; i++ ) ctoi[i+'0'] = i;
-// }
+vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b);
+vector<int> vec_minus(const vector<int> &a, const vector<int> &b);
+string vec2str( const vector<int> &vec );
+void check(const vector<int> &va, const vector<int> &vb, const string &op);
 
 int main(int argc, char *argv[] ) 
 {
-    auto start = chrono::system_clock::now();
-    sqrt_decimal("2", 10000);
-    auto end = chrono::system_clock::now();
-    chrono::duration<double> diff = end-start;
+    chrono::duration<double> diff;
+    auto stage0 = chrono::system_clock::now();
+    sqrt_decimal("2", 10);
+    auto stage1 = chrono::system_clock::now();
+    
+    diff = stage1-stage0;
     cout << "Time Used: " << diff.count() << " s" << endl;
     return 0;
 }
 
 string sqrt_decimal(const string &num, int precision)
 {
+    int BASE = 10^6;
     static string itoc("0123456789");
     static vector<string> itos{"0","1","2","3","4","5","6","7","8","9"};
+
     int len = num.length(), mod = len % 2, skip = 2 - mod;
     string target = num.substr(0, skip);
     string tnum = num.substr(skip);
@@ -111,7 +114,7 @@ string sqrt_decimal(const string &num, int precision)
                 if ( base.back() < '9' )
                     base.back() += 1, base += (dbmid-10)+'0';
                 else
-                    base = s_plus( base + "0", to_string(dbmid) );
+                    cerr << "what's wrong with you?" << endl;
             else
                 base += dbmid+'0';
         }
@@ -119,6 +122,62 @@ string sqrt_decimal(const string &num, int precision)
     }
     cout << endl;
     return "";
+}
+
+// vec multiply to one word
+vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b)
+{
+    static int ia; // iter
+    const int base = 1000000;
+    //如果b是0，直接返回0
+    if ( b[0] == 0 ) return vector<int>{0};
+    vector<int> c( a.size() );
+    int t, pool=0, ib=b.size()-1;
+    for (ia = a.size()-1; ia >= 0; ia-- )
+    {
+        t = a[ia] * b[0] + pool;
+        c[ia] = t%base, pool = t/base;
+    }
+    if ( pool > 0 ) c.insert(c.begin(), pool);
+    return c;
+}
+
+// vec_minus 设 a.len > b.len
+vector<int> vec_minus(const vector<int> &a, const vector<int> &b)
+{
+    static int ia; // iter
+    const int base = 1000000;
+    vector<int> c( a.size() );
+    int t, cut=0, ib=b.size()-1, zero=0;
+    for (ia = a.size()-1; ia >= 0; ia-- )
+    {
+        t = ib >= 0 ? (a[ia]) - (b[ib--]) + cut
+                    : (a[ia]) + cut;
+        t < 0 ? t += base, cut = -1 : cut = 0;
+        zero = t == 0 ? zero+1 : 0;  // 此判断须独立，t有可能+base后才为0
+        c[ia] = t;
+    }
+    c.erase(c.begin(), c.begin()+zero);
+    return c;
+}
+
+string vec2str( const vector<int> &vec )
+{
+    const int base = 1000000;
+    string s("");
+    s += to_string( vec[0] );
+    for ( int it = 1; it < vec.size(); it++ )
+        s += to_string(vec[it]+base).substr(1,6);
+    return s;
+}
+
+void check(const vector<int> &va, const vector<int> &vb, const string &op)
+{
+    string a = vec2str(va);
+    string b = vec2str(vb);
+    string cmd = "perl -Mbignum -e \"print " + a + op + b + "\"";
+    system( cmd.c_str() );
+    cout << " <- check " << endl;
 }
 
 // bignum * single num (str*str)
@@ -135,23 +194,6 @@ string s_mp_single(const string& a, const string& b)
     {
         t = (a[idx]-'0') * numb + pool;
         s[idx] = t%10 + '0', pool = t/10;
-    }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
-    return s;
-}
-
-// plus 属于标准库函数的名称，所以加了前缀
-// 调用前应确认a的长度大于b
-string s_plus(const string& a, const string& b)
-{
-    static int ia;
-    string s( a.length(), '0');
-    int t, pool=0, ib=b.length()-1;
-    for (ia = a.length()-1; ia >= 0; ia-- )
-    {
-        t = ib >= 0 ? (a[ia]-'0') + (b[ib--]-'0') + pool
-                    : (a[ia]-'0') + pool;
-        s[ia] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
     return s;
@@ -181,11 +223,4 @@ int s_cmp(const string &a, const string &b )
     if ( a.length() > b.length() ) return 1;
     else if ( a.length() < b.length() ) return -1;
     else return a.compare(b);
-}
-
-void check(string a, string b)
-{
-    string cmd = "perl -Mbignum -e \"print qq(check: ), " + a + "-" + b + "\"";
-    system( cmd.c_str() );
-    cout << endl;
 }
