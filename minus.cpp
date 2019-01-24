@@ -64,13 +64,17 @@ int main(int argc, char *argv[] )
     // vector<int> test{123, 909, 1};
     // cout << vec2str( test ) << endl;
 
-    vector<int> va{123456, 654321};
+    vector<int> va{552, 443, 123456, 654321};
     vector<int> vb{ 93456, 924321};
     check(va, vb);
     vector<int> vc = vec_minus(va,vb);
-    for (int it = 0; it < vc.size(); it++) 
-        cout << vc[it] << "," ;
-    cout << endl;
+    cout << vec2str(vc) << endl;
+
+    va = {1, 0, 0};
+    vb = {999999};
+    check(va, vb);
+    vc = vec_minus(va, vb);
+    cout << vec2str(vc) << endl;
 
     return 0;
 }
