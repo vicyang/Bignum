@@ -6,7 +6,7 @@ CPU i7 4790K 4.00GHz
   ```perl
   use bignum 'a'=>10000;
   printf "%s\n", sqrt(2);
-  ```  
+  ```
   耗时4.5s  
 
 * __Python__  
@@ -15,7 +15,7 @@ CPU i7 4790K 4.00GHz
   from decimal import *
   getcontext().prec = 100000
   print(Decimal(2).sqrt())
-  ```  
+  ```
   耗时 1.0s  
 
 * __CPP Decimal Solution__  
@@ -49,12 +49,12 @@ CPU i7 4790K 4.00GHz
             base = s_plus( base + "0", to_string(dbmid) );
     else
         base += dbmid+'0';
-    ```  
+    ```
     原因是每一次 base更新，都是叠加mid*2，因此base末尾只可能是偶数，不可能达到9。  
     耗时减小大约 1/6  
 
     __乘法__  
-    `s_mp = s_mp_single( base+itoc[mid], itos[mid] );`  
+    `s_mp = s_mp_single( base+itoc[mid], itos[mid] );`
     由于是乘以单个数字，当mid是1的时候，可以直接返回参数a，当mid是0的时候，可以直接返回0。  
 
   
