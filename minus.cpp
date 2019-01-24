@@ -27,7 +27,7 @@ int main(int argc, char *argv[] )
 
     string c;
     //耗时测试
-    for (int i = 0; i < 50000; i++) s_minus(a, b);
+    for (int i = 0; i < 20000; i++) s_minus(a, b);
     auto stage1 = chrono::system_clock::now();
     diff = stage1-stage0;
     printf("Stage1, Time used: %f\n", diff.count());
@@ -38,7 +38,7 @@ int main(int argc, char *argv[] )
 
     //测试 c_minus 性能
     {
-        for (int i = 0; i < 50000; i++) c_minus(ch_a, ch_b);
+        for (int i = 0; i < 20000; i++) c_minus(ch_a, ch_b);
         auto stage2 = chrono::system_clock::now();
         diff = stage2-stage1;
         printf("Stage2, Time used: %f\n", diff.count());
