@@ -6,7 +6,7 @@ using namespace std;
 
 string s_plus(const string& a, const string& b);
 string sn_plus(const string& a, const string& b);
-string vec_plus(const vector<int>& a, const vector<int>& b);
+string vec_plus(const vector<int>& a, const vector<int>& b, int len);
 void check(const string &a, const string &b);
 
 int main(int argc, char *argv[] ) 
@@ -26,12 +26,13 @@ int main(int argc, char *argv[] )
     check(string (20, '9'), string(20, '9') );
     stage1 = chrono::system_clock::now();
 
-    vector<int> va(5, 9999);
-    vector<int> vb(5, 9999);
-    string sc = vec_plus(va, vb);
-    cout << sc << endl;
+    vector<int> va(4000, 999999);
+    vector<int> vb(4000, 999999);
+    int len = 4000*6;
+    string sc = vec_plus(va, vb, len);
+    //cout << sc << endl;
     //耗时测试
-    for (int i = 0; i < 1000; i++) vec_plus(va, vb);
+    for (int i = 0; i < 1000; i++) vec_plus(va, vb, len);
     auto stage2 = chrono::system_clock::now();
     diff = stage2-stage1;
     cout << "Stage 2, Time Used: " << diff.count() << " s" << endl;
@@ -54,11 +55,11 @@ int main(int argc, char *argv[] )
 }
 
 // 测试vector作为参数
-string vec_plus(const vector<int> &a, const vector<int> &b)
+string vec_plus(const vector<int> &a, const vector<int> &b, int len)
 {
     static int ia; // iter
-    const int base = 10000;
-    string s;
+    const int base = 1000000;
+    string s(25000, '0');
     //string s(20002, '0');
     int t, pool=0, ib=b.size()-1;
     int v, r;
@@ -67,7 +68,7 @@ string vec_plus(const vector<int> &a, const vector<int> &b)
         t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
                     : (a[ia]) + pool;
         v = t % base, pool = t/base;
-        s.insert( 0, to_string(v) );
+        s.replace( ia*6, 6, to_string(v) );
         // s[ia*4] = v/1000 + '0', v=v%1000;
         // s[ia*4+1] = v/100 + '0', v=v%100;
         // s[ia*4+2] = v/10 + '0', v=v%10;
