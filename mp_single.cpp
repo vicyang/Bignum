@@ -3,12 +3,32 @@
 // 2019-01
 
 #include <iostream>
+#include <string>
+#include <vector>
 #include <chrono>
 using namespace std;
 
 string s_mp_single(const string& a, const string& b);
-string s_mp_int(const string& a, int b);
-void check(string a, string b);
+vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b);
+
+string vec2str( const vector<int> &vec )
+{
+    const int base = 1000000;
+    string s("");
+    s += to_string( vec[0] );
+    for ( int it = 1; it < vec.size(); it++ )
+        s += to_string(vec[it]+base).substr(1,6);
+    return s;
+}
+
+void check(const vector<int> &va, const vector<int> &vb, const string &op)
+{
+    string a = vec2str(va);
+    string b = vec2str(vb);
+    string cmd = "perl -Mbignum -e \"print " + a + op + b + "\"";
+    system( cmd.c_str() );
+    cout << " <- check " << endl;
+}
 
 int main(int argc, char *argv[] ) 
 {
@@ -23,42 +43,39 @@ int main(int argc, char *argv[] )
         diff = chrono::system_clock::now()-stage0;
         cout << "Time Used: " << diff.count() << " s" << endl;
     }
-
-    auto stage1 = chrono::system_clock::now();
-    int n;
-    // 耗时测试 2
-    {
-        n = stoi(b);
-        for (int i = 0; i < 10; i++) s_mp_int(a, n);
-        diff = chrono::system_clock::now()-stage1;
-        cout << "Time Used: " << diff.count() << " s" << endl;
-    }
-
-    // 其他测试
-    a="999";
-    c = s_mp_int( a, n );
-    //check(a, b);
-    //cout << c << endl;
+        
+    vector<int> va{999,999999};
+    vector<int> vb{9};
+    check(va, vb, "*");
+    vector<int> vc = vec_mp_single(va, vb);
+    cout << vec2str(vc) << endl;
     
+    auto stage1 = chrono::system_clock::now();
+    va.assign( 1700000, 999999 );
+    vb.assign( 1, 8 );
+    for (int i = 0; i < 10; i++) vec_mp_single(va, vb);
+    auto stage2 = chrono::system_clock::now();
+    diff = stage2-stage1;
+    cout << "Stage 2, Time Used: " << diff.count() << " s" << endl;
     return 0;
 }
 
-// bignum * single num (str * int)
-string s_mp_int(const string& a, int b)
+// vector作为参数
+vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b)
 {
-    static int idx;
-    string s;
+    static int ia; // iter
+    const int base = 1000000;
     //如果b是0，直接返回0
-    if ( b == 0 ) return "0";
-    s.assign(a.length(), '0');
-    int t, pool = 0;
-    for ( idx = a.length()-1; idx >= 0; idx-- )
+    if ( b[0] == 0 ) return vector<int>{0};
+    vector<int> c( a.size() );
+    int t, pool=0, ib=b.size()-1;
+    for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = (a[idx]-'0') * b + pool;
-        s[idx] = t%10 + '0', pool = t/10;
+        t = a[ia] * b[0] + pool;
+        c[ia] = t%base, pool = t/base;
     }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
-    return s;
+    if ( pool > 0 ) c.insert(c.begin(), pool);
+    return c;
 }
 
 // bignum * single num (str*str)
@@ -77,11 +94,4 @@ string s_mp_single(const string& a, const string& b)
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
     return s;
-}
-
-void check(string a, string b)
-{
-    string cmd = "perl -Mbignum -e \"print " + a + "*" + b + "\"";
-    system( cmd.c_str() );
-    cout << endl;
 }
