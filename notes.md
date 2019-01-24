@@ -57,6 +57,14 @@ CPU i7 4790K 4.00GHz
     `s_mp = s_mp_single( base+itoc[mid], itos[mid] );`
     由于是乘以单个数字，当mid是1的时候，可以直接返回参数a，当mid是0的时候，可以直接返回0。  
 
+  * vector 向量方案
+    所有数字以10的N次方为进制存储于向量列表，例如6次方，每6位数字存储到一个int变量
+    * 向量转换
+      123000456 转 vector 为 vector<int> v{123,456};
+      v{123,456} 转 str 为 to_string(v[0]) + to_string(v[1]+1000000).substr(1,6)
+      
+
+
   
 
   
