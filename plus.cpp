@@ -6,14 +6,22 @@ using namespace std;
 
 string s_plus(const string& a, const string& b);
 string sn_plus(const string& a, const string& b);
-vector<int> vec_plus(const vector<int>& a, const vector<int>& b, int len);
+vector<int> vec_plus(const vector<int>& a, const vector<int>& b);
+
+string vec2str( const vector<int> &vec )
+{
+    const int base = 1000000;
+    string s("");
+    s += to_string( vec[0] );
+    for ( int it = 1; it < vec.size(); it++ )
+        s += to_string(vec[it]+base).substr(1,6);
+    return s;
+}
 
 void check(const vector<int> &va, const vector<int> &vb)
 {
-    string a("");
-    string b("");
-    for ( int it = 0; it < va.size(); it++ ) a += to_string(va[it]);
-    for ( int it = 0; it < vb.size(); it++ ) b += to_string(vb[it]);
+    string a = vec2str(va);
+    string b = vec2str(vb);
     string cmd = "perl -Mbignum -e \"print " + a + "+" + b + "\"";
     system( cmd.c_str() );
     cout << " <- check " << endl;
@@ -33,21 +41,19 @@ int main(int argc, char *argv[] )
     diff = stage1-stage0;
     cout << "Stage 1, Time Used: " << diff.count() << " s" << endl;
     
-    vector<int> va{999,406789};
-    vector<int> vb{123,906789};
+    vector<int> va{999,999999};
+    vector<int> vb{999,1};
     check(va, vb);
     stage1 = chrono::system_clock::now();
 
-    int len = 12;
-    vector<int> vc = vec_plus(va, vb, len);
-    for (int it = 0; it < vc.size(); it++) 
-        cout << vc[it] << "," ;
-    cout << endl;
+    vector<int> vc = vec_plus(va, vb);
+    cout << vec2str(vc) << endl;
+
     //耗时测试
 
     va.assign( 4000, 999999 );
     vb.assign( 4000, 999999 );
-    for (int i = 0; i < 1000; i++) vec_plus(va, vb, len);
+    for (int i = 0; i < 1000; i++) vec_plus(va, vb);
     auto stage2 = chrono::system_clock::now();
     diff = stage2-stage1;
     cout << "Stage 2, Time Used: " << diff.count() << " s" << endl;
@@ -70,7 +76,7 @@ int main(int argc, char *argv[] )
 }
 
 // 测试vector作为参数
-vector<int> vec_plus(const vector<int> &a, const vector<int> &b, int len)
+vector<int> vec_plus(const vector<int> &a, const vector<int> &b)
 {
     static int ia; // iter
     const int base = 1000000;
