@@ -6,8 +6,18 @@ using namespace std;
 
 string s_plus(const string& a, const string& b);
 string sn_plus(const string& a, const string& b);
-string vec_plus(const vector<int>& a, const vector<int>& b, int len);
-void check(const string &a, const string &b);
+vector<int> vec_plus(const vector<int>& a, const vector<int>& b, int len);
+
+void check(const vector<int> &va, const vector<int> &vb)
+{
+    string a("");
+    string b("");
+    for ( int it = 0; it < va.size(); it++ ) a += to_string(va[it]);
+    for ( int it = 0; it < vb.size(); it++ ) b += to_string(vb[it]);
+    string cmd = "perl -Mbignum -e \"print " + a + "+" + b + "\"";
+    system( cmd.c_str() );
+    cout << " <- check " << endl;
+}
 
 int main(int argc, char *argv[] ) 
 {
@@ -22,16 +32,21 @@ int main(int argc, char *argv[] )
     auto stage1 = chrono::system_clock::now();
     diff = stage1-stage0;
     cout << "Stage 1, Time Used: " << diff.count() << " s" << endl;
-
-    check(string (20, '9'), string(20, '9') );
+    
+    vector<int> va{999,406789};
+    vector<int> vb{123,906789};
+    check(va, vb);
     stage1 = chrono::system_clock::now();
 
-    vector<int> va(4000, 999999);
-    vector<int> vb(4000, 999999);
-    int len = 4000*6;
-    string sc = vec_plus(va, vb, len);
-    //cout << sc << endl;
+    int len = 12;
+    vector<int> vc = vec_plus(va, vb, len);
+    for (int it = 0; it < vc.size(); it++) 
+        cout << vc[it] << "," ;
+    cout << endl;
     //耗时测试
+
+    va.assign( 4000, 999999 );
+    vb.assign( 4000, 999999 );
     for (int i = 0; i < 1000; i++) vec_plus(va, vb, len);
     auto stage2 = chrono::system_clock::now();
     diff = stage2-stage1;
@@ -55,11 +70,11 @@ int main(int argc, char *argv[] )
 }
 
 // 测试vector作为参数
-string vec_plus(const vector<int> &a, const vector<int> &b, int len)
+vector<int> vec_plus(const vector<int> &a, const vector<int> &b, int len)
 {
     static int ia; // iter
     const int base = 1000000;
-    string s(25000, '0');
+    vector<int> c( a.size() );
     //string s(20002, '0');
     int t, pool=0, ib=b.size()-1;
     int v, r;
@@ -68,14 +83,10 @@ string vec_plus(const vector<int> &a, const vector<int> &b, int len)
         t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
                     : (a[ia]) + pool;
         v = t % base, pool = t/base;
-        s.replace( ia*6, 6, to_string(v) );
-        // s[ia*4] = v/1000 + '0', v=v%1000;
-        // s[ia*4+1] = v/100 + '0', v=v%100;
-        // s[ia*4+2] = v/10 + '0', v=v%10;
-        // s[ia*4+3] = v + '0';
+        c[ia] = v;
     }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
-    return s;
+    if ( pool > 0 ) c.insert(c.begin(), pool);
+    return c;
 }
 
 // plus 属于标准库函数的名称，所以加了前缀
@@ -110,9 +121,3 @@ string sn_plus(const string& a, const string& b)
     return s;
 }
 
-void check(const string &a, const string &b)
-{
-    string cmd = "perl -Mbignum -e \"print " + a + "+" + b + "\"";
-    system( cmd.c_str() );
-    cout << " <- check " << endl;
-}
