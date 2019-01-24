@@ -7,12 +7,20 @@ using namespace std;
 string s_minus(string a, string b);
 int s_cmp( string &a, string &b );
 
+string vec2str( const vector<int> &vec )
+{
+    const int base = 1000000;
+    string s("");
+    s += to_string( vec[0] );
+    for ( int it = 1; it < vec.size(); it++ )
+        s += to_string(vec[it]+base).substr(1,6);
+    return s;
+}
+
 void check(const vector<int> &va, const vector<int> &vb)
 {
-    string a("");
-    string b("");
-    for ( int it = 0; it < va.size(); it++ ) a += to_string(va[it]);
-    for ( int it = 0; it < vb.size(); it++ ) b += to_string(vb[it]);
+    string a = vec2str(va);
+    string b = vec2str(vb);
     string cmd = "perl -Mbignum -e \"print " + a + "-" + b + "\"";
     system( cmd.c_str() );
     cout << " <- check " << endl;
@@ -52,6 +60,9 @@ int main(int argc, char *argv[] )
     auto stage1 = chrono::system_clock::now();
     diff = stage1-stage0;
     cout << "s_minus, Time used: " << diff.count() << endl;
+
+    // vector<int> test{123, 909, 1};
+    // cout << vec2str( test ) << endl;
 
     vector<int> va{123456, 654321};
     vector<int> vb{ 93456, 924321};
