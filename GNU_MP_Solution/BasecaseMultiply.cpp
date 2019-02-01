@@ -33,14 +33,13 @@ int main(int argc, char *argv[] )
 vector<ULL> mp_single( const vector<ULL>& a, int b)
 {
     vector<ULL> c( a.size() );
+    if ( b == 0 ) { return vector<ULL>{0}; }
     ULL pool = 0, v;
-    for ( int i = a.size()-1; i >=0 ; i-- )
-    {
+    for ( int i = a.size()-1; i >=0 ; i-- ) {
         v = a[i] * b + pool;
-        //cout << a[i] << "*" << b << "+pool=" << v << endl;
         c[i] = v % BASE, pool = v / BASE;
     }
-    if (pool > 0) c.push_back( pool );
+    if (pool > 0) c.insert( c.begin(), pool );
     return c;
 }
 
