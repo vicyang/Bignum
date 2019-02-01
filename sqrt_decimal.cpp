@@ -161,13 +161,15 @@ string s_plus(const string& a, const string& b)
 string s_minus(const string& a, const string& b)
 {
     static int ia;
+    register const char* pa = a.data();
+    register const char* pb = b.data();
     if ( a.compare(b) == 0 ) return "0";
-    string s( a.length(), '0');
-    int t, cut=0, ib=b.length()-1, zero=0;
-    for (ia = a.length()-1; ia >= 0; ia-- )
+    string s( a.size(), '0');
+    int t, cut=0, ib=b.size()-1, zero=0;
+    for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]-'0') - (b[ib--]-'0') - cut 
-                    : (a[ia]-'0') - cut;
+        t = ib >= 0 ? (pa[ia]-'0') - (pb[ib--]-'0') - cut 
+                    : (pa[ia]-'0') - cut;
         cut = t < 0 ? 1 : 0;
         s[ia] = t + '0' + cut*10;
         s[ia] == '0' ? zero++ : zero=0;
