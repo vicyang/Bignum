@@ -22,9 +22,8 @@ int main(int argc, char *argv[] )
     //cout << c;
 
     vector<ULL> c;
-    c = mp_single( a, b[1] );
-    for ( int x : c )
-        cout << x << ",";
+    c = BasecaseMultiply( a, b );
+    cout << vec2str(c);
 
 
     return 0;
@@ -47,6 +46,12 @@ vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
 {
     vector<ULL> c;
     vector<ULL> t;
+    int bi = b.size() - 1;
+    c = mp_single( a, b[bi--] );
+    // while ( bi-- >= 0 )
+    // {
+    //     c = mp_single(a, b[bi--]);
+    // }
 
     return c;
 }
