@@ -1,72 +1,81 @@
 #include <iostream>
 #include <string>
-#include <stdio.h>
+#include <vector>
 #include <chrono>
 using namespace std;
+typedef unsigned long long ULL;
 
-string s_mp_single(const string& a, char b);
-string s_plus(const string& a, const string& b);
-string BasecaseMultiply( const string& a, const string& b);
+string vec2str( const vector<ULL> &vec );
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
+vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b);
+vector<ULL> mp_single( const vector<ULL>& a, int b);
 string zeros(10000, '0');
+
+const unsigned long long BASE = 1000000;
+const int MAXLEN = 6;
 
 int main(int argc, char *argv[] ) 
 {
-    string a;
-    string b;
-    a.assign(5, '1');
-    b.assign(5, '1');
-    string c = BasecaseMultiply(a, b);
-    cout << c;
+    vector<ULL> a{123, 666666};
+    vector<ULL> b{456, 999999};
+    // string c = BasecaseMultiply(a, b);
+    //cout << c;
+
+    vector<ULL> c;
+    c = mp_single( a, b[1] );
+    for ( int x : c )
+        cout << x << ",";
+
+
     return 0;
 }
 
-string BasecaseMultiply( const string& a, const string& b)
+vector<ULL> mp_single( const vector<ULL>& a, int b)
 {
-    string c;
-    string t;
-    c = s_mp_single( a, b[0] );
-    for (int j = 1; j < a.length(); j++)
+    vector<ULL> c( a.size() );
+    ULL pool = 0, v;
+    for ( int i = a.size()-1; i >=0 ; i-- )
     {
-        t = s_mp_single(a, b[j]);
-        if ( t.compare("0") != 0 ) {
-            t = t + zeros.substr(0, j);
-        }
-        c = s_plus( t, c ); // t is longer than c
+        v = a[i] * b + pool;
+        //cout << a[i] << "*" << b << "+pool=" << v << endl;
+        c[i] = v % BASE, pool = v / BASE;
     }
+    if (pool > 0) c.push_back( pool );
     return c;
 }
 
-// bignum * single num (str * str (one word) )
-string s_mp_single(const string& a, char b)
+vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
 {
-    static int idx;
-    string s;
-    //如果b是0，直接返回0
-    if ( b == '0' ) return "0";
-    s.assign(a.length(), '0');
-    int t, pool = 0, numb = b - '0';
-    for ( idx = a.length()-1; idx >= 0; idx-- )
-    {
-        t = (a[idx]-'0') * numb + pool;
-        s[idx] = t%10 + '0', pool = t/10;
-    }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
-    return s;
+    vector<ULL> c;
+    vector<ULL> t;
+
+    return c;
 }
 
-// plus 属于标准库函数的名称，所以加了前缀
-// 备注：此函数假设a.len > b.len
-string s_plus(const string& a, const string& b)
+// 测试vector作为参数
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
 {
-    static int ia;
-    string s( a.length(), '0');
-    int t, pool=0, ib=b.length()-1;
-    for (ia = a.length()-1; ia >= 0; ia-- )
+    static int ia; // iter
+    vector<ULL> c( a.size() );
+    //string s(20002, '0');
+    int t, pool=0, ib=b.size()-1;
+    int v, r;
+    for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]-'0') + (b[ib--]-'0') + pool
-                    : (a[ia]-'0') + pool;
-        s[ia] = t%10 + '0', pool = t/10;
+        t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
+                    : (a[ia]) + pool;
+        v = t % BASE, pool = t/BASE;
+        c[ia] = v;
     }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
+    if ( pool > 0 ) c.insert(c.begin(), pool);
+    return c;
+}
+
+string vec2str( const vector<ULL> &vec )
+{
+    string s("");
+    s += to_string( vec[0] );
+    for ( int it = 1; it < vec.size(); it++ )
+        s += to_string(vec[it]+BASE).substr(1, MAXLEN);
     return s;
 }
