@@ -35,6 +35,7 @@ int main(int argc, char *argv[] )
     char* ch_c = c_minus(ch_a, ch_b);
     //printf("%s\n", ch_c);
     printf("%d\n", strlen(ch_c) );
+    stage1 = chrono::system_clock::now();
 
     //测试 c_minus 性能
     {
