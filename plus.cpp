@@ -6,7 +6,7 @@ using namespace std;
 
 string s_plus(const string& a, const string& b);
 string sn_plus(const string& a, const string& b);
-string vec_plus(const vector<int>& a, const vector<int>& b);
+string vec_plus(vector<int>& a, vector<int>& b);
 void check(string a, string b);
 
 int main(int argc, char *argv[] ) 
@@ -84,15 +84,17 @@ string sn_plus(const string& a, const string& b)
 }
 
 // 测试vector作为参数
-string vec_plus(const vector<int> &a, const vector<int> &b)
+string vec_plus(vector<int> &a, vector<int> &b)
 {
     static int ia; // iter
+    register int *pa = a.data();
+    register int *pb = b.data();
     string s( a.size(), '0');
     int t, pool=0, ib=b.size()-1;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
-                    : (a[ia]) + pool;
+        t = ib >= 0 ? (pa[ia]) + (pb[ib--]) + pool
+                    : (pa[ia]) + pool;
         s[ia] = t%10 + '0', pool = t/10;
     }
     if ( pool > 0 ) s.insert(0, 1, pool+'0');
