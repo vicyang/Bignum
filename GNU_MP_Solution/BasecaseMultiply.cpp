@@ -1,3 +1,7 @@
+// BasecaseMultiply - C++
+// 523066680/vicyang
+// 2019-01
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -15,14 +19,23 @@ string zeros(10000, '0');
 const unsigned long long BASE = 1000000;
 const int MAXLEN = 6;
 
+void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
+{
+    string a = vec2str(va);
+    string b = vec2str(vb);
+    string cmd = "perl -Mbignum -e \"print " + a + op + b + "\"";
+    system( cmd.c_str() );
+    cout << " <- check " << endl;
+}
+
 int main(int argc, char *argv[] ) 
 {
-    vector<ULL> a{123, 666666};
-    vector<ULL> b{456, 999999};
+    vector<ULL> a{777, 0, 666666};
+    vector<ULL> b{1, 0, 999999};
     vector<ULL> c;
+    check( a, b, "*" );
     c = BasecaseMultiply( a, b );
     cout << vec2str(c);
-
     return 0;
 }
 
@@ -42,7 +55,7 @@ vector<ULL> vec_mp_single( const vector<ULL>& a, int b)
 // 参数：向量引用、 前移的段数（也许需要考虑vec为0的情况）
 void shift( vector<ULL>& vec, int n )
 {
-    for (int i = 0; i < n; i++) vec.push_back(0);
+    for (int i = 1; i <= n; i++) vec.push_back(0);
 }
 
 // 假设 b.size() >= a.size()
@@ -50,13 +63,17 @@ vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
 {
     vector<ULL> c;
     vector<ULL> t;
-    int bi = b.size() - 1, append = 1;
+    int bi = b.size() - 1, indent = 1;
     c = vec_mp_single( a, b[bi--] );
     while ( bi >= 0 )
     {
-        t = vec_mp_single(a, b[bi--]);
-        shift(t, append++);
-        c = vec_plus(c, t);
+        if ( b[bi] > 0 )
+        {
+            t = vec_mp_single(a, b[bi]);
+            shift(t, indent);
+            c = vec_plus(t, c);
+        }
+        bi--, indent++;
     }
     return c;
 }
@@ -66,15 +83,13 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
 {
     static int ia; // iter
     vector<ULL> c( a.size() );
-    //string s(20002, '0');
     int t, pool=0, ib=b.size()-1;
     int v, r;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
                     : (a[ia]) + pool;
-        v = t % BASE, pool = t/BASE;
-        c[ia] = v;
+        c[ia] = t % BASE, pool = t/BASE;
     }
     if ( pool > 0 ) c.insert(c.begin(), pool);
     return c;
