@@ -14,10 +14,9 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b);
 vector<ULL> vec_mp_single( const vector<ULL>& a, int b);
 void shift( vector<ULL>& vec, int n );
-string zeros(10000, '0');
 
-const unsigned long long BASE = 1000000;
-const int MAXLEN = 6;
+const unsigned long long BASE = 100000000;
+const int MAXLEN = 8;
 
 void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
 {
@@ -30,8 +29,8 @@ void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
 
 int main(int argc, char *argv[] ) 
 {
-    vector<ULL> a{777, 0, 666666};
-    vector<ULL> b{1, 0, 999999};
+    vector<ULL> a{777, 0, 12345678};
+    vector<ULL> b{6, 99999999, 99999999};
     vector<ULL> c;
     check( a, b, "*" );
     c = BasecaseMultiply( a, b );
