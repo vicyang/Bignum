@@ -2,3 +2,4 @@
 *.out
 *.obj
 check_eol.pl
+*_prof.txt
