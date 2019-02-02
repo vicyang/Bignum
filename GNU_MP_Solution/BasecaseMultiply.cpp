@@ -11,10 +11,9 @@ using namespace std::chrono;
 typedef unsigned long long ULL;
 
 string vec2str( const vector<ULL> &vec );
-vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b, int abegin);
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b);
-vector<ULL> vec_mp_single( const vector<ULL>& a, ULL b);
-void shift( vector<ULL>& vec, int n );
+int vec_mp_single( const vector<ULL>& a, ULL b, vector<ULL>& c, ULL indent);
 void time_used(system_clock::time_point& time_a);
 
 const ULL BASE = 100000000;
@@ -37,7 +36,15 @@ int main(int argc, char *argv[] )
     vector<ULL> c;
     check( a, b, "*" );
     c = BasecaseMultiply( a, b );
+    if (c[0] == 0ULL ) c.erase( c.begin() );
     cout << vec2str(c) << endl;
+
+
+    vector<ULL> t( a.size()+1 );
+    int test = vec_mp_single(a, 1, t, 0);
+    if (t[0] == 0ULL ) t.erase( t.begin() );
+    cout << "test: " << test << endl;
+    cout << "tval: " << vec2str(t) << endl;
 
     start = system_clock::now();
     a.assign( 1250, 99999999 );
@@ -49,52 +56,49 @@ int main(int argc, char *argv[] )
     return 0;
 }
 
-// 参数：向量引用、 前移的段数（也许需要考虑vec为0的情况）
-void shift( vector<ULL>& vec, int n ) 
-{
-    for (register int i = 1; i <= n; i++) vec.emplace_back(0);
-}
-
 // 假设 b.size() >= a.size()
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
 {
-    vector<ULL> c;
-    vector<ULL> t;
+    vector<ULL> c(a.size() + b.size(), 0);
+    vector<ULL> t(a.size() + b.size(), 0);
+    int tpos = 1, tbegin;
     register const ULL* pa = a.data();
     register const ULL* pb = b.data();
     int bi = b.size() - 1, indent = 1;
-    c = vec_mp_single( a, pb[bi--] );
+    //初始化C值，末尾offset为0
+    vec_mp_single( a, pb[bi--], c, 0 );
     while ( bi >= 0 )
     {
+        //如果对应的b==0则不计入
         if ( pb[bi] > 0 )
         {
-            t = vec_mp_single(a, pb[bi]);
-            shift(t, indent);
-            c = vec_plus(t, c);
+            tbegin = vec_mp_single(a, pb[bi], t, tpos);
+            c = vec_plus(t, c, tbegin);
         }
-        bi--, indent++;
+        bi--, indent++, tpos++;
     }
     return c;
 }
 
-vector<ULL> vec_mp_single( const vector<ULL>& a, ULL b)
+int vec_mp_single( const vector<ULL>& a, ULL b, vector<ULL>& c, ULL indent)
 {
-    vector<ULL> c( a.size() );
     register const ULL *pa = a.data();
     register ULL *pc = c.data();
-
-    if ( b == 0 ) { return vector<ULL>{0}; }
+    if ( b == 0 ) { c[0] = 0; return 1; }
+    //实际末位置
+    int ci = c.size() - 1 - indent;
     ULL pool = 0, v;
     for ( int i = a.size()-1; i >=0 ; i-- ) {
         v = pa[i] * b + pool;
-        pc[i] = v % BASE, pool = v / BASE;
+        pc[ci--] = v % BASE, pool = v/BASE;
     }
-    if (pool > 0) c.insert( c.begin(), pool );
-    return c;
+    if (pool > 0) { pc[ci--] = pool; }
+    //返回实际起始位置
+    return ci+1;
 }
 
 // a.size() <= b.size()
-vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b, int abegin)
 {
     static int ia; // iter
     register const ULL* pa = a.data();
@@ -103,7 +107,7 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
     register ULL* pc = c.data();
     ULL t, pool=0;
     int ib=b.size()-1;
-    for (ia = a.size()-1; ia >= 0; ia-- )
+    for (ia = a.size()-1; ia >= abegin; ia-- )
     {
         t = ib >= 0 ? (pa[ia]) + (pb[ib--]) + pool
                     : (pa[ia]) + pool;
