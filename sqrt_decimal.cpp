@@ -145,16 +145,14 @@ vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b)
 // vec_minus 设 a.len > b.len
 vector<int> vec_minus(const vector<int> &a, const vector<int> &b)
 {
-    register const int* pa = a.data();
-    register const int* pb = b.data();
     static int ia; // iter
     const int base = 1000000;
     vector<int> c( a.size() );
     int t, cut=0, ib=b.size()-1, zero=0;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (pa[ia]) - (pb[ib--]) + cut
-                    : (pa[ia]) + cut;
+        t = ib >= 0 ? (a[ia]) - (b[ib--]) + cut
+                    : (a[ia]) + cut;
         t < 0 ? t += base, cut = -1 : cut = 0;
         zero = t == 0 ? zero+1 : 0;  // 此判断须独立，t有可能+base后才为0
         c[ia] = t;
@@ -204,17 +202,19 @@ string s_mp_single(const string& a, const string& b)
 // 大数减法 字符串操作, 暂时假设 a >= b
 string s_minus(const string& a, const string& b)
 {
+    const char* pa = a.data();
+    const char* pb = b.data();
     static int ia;
     if ( a.compare(b) == 0 ) return "0";
     string s( a.length(), '0');
-    int t, cut=0, ib=b.length()-1, zero=0;
+    int t, v, cut=0, ib=b.length()-1, zero=0;
     for (ia = a.length()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]-'0') - (b[ib--]-'0') - cut 
-                    : (a[ia]-'0') - cut;
+        t = ib >= 0 ? (pa[ia]-'0') - (pb[ib--]-'0') - cut 
+                    : (pa[ia]-'0') - cut;
         cut = t < 0 ? 1 : 0;
-        s[ia] = t + '0' + cut*10;
-        s[ia] == '0' ? zero++ : zero=0;
+        v = t + '0' + cut*10, s[ia] = v;
+        v == '0' ? zero++ : zero=0;
     }
     if (zero > 0) s.erase(0, zero);
     return s;
