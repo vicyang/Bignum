@@ -7,6 +7,7 @@
 #include <vector>
 #include <chrono>
 using namespace std;
+using namespace std::chrono;
 typedef unsigned long long ULL;
 
 string vec2str( const vector<ULL> &vec );
@@ -14,6 +15,7 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b);
 vector<ULL> vec_mp_single( const vector<ULL>& a, int b);
 void shift( vector<ULL>& vec, int n );
+void time_used(system_clock::time_point& time_a);
 
 const unsigned long long BASE = 100000000;
 const int MAXLEN = 8;
@@ -29,12 +31,21 @@ void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
 
 int main(int argc, char *argv[] ) 
 {
+    system_clock::time_point start;
     vector<ULL> a{777, 0, 12345678};
     vector<ULL> b{6, 99999999, 99999999};
     vector<ULL> c;
     check( a, b, "*" );
     c = BasecaseMultiply( a, b );
-    cout << vec2str(c);
+    cout << vec2str(c) << endl;
+
+    start = system_clock::now();
+    a.assign( 1250, 99999999 );
+    b.assign( 1250, 11111111 );
+    for (int i=0; i<100; i++) c = BasecaseMultiply( a, b );
+    //cout << vec2str(c) << endl;
+    time_used( start );
+
     return 0;
 }
 
@@ -101,4 +112,11 @@ string vec2str( const vector<ULL> &vec )
     for ( int it = 1; it < vec.size(); it++ )
         s += to_string(vec[it]+BASE).substr(1, MAXLEN);
     return s;
+}
+
+void time_used(system_clock::time_point& time_a) {
+    duration<double> diff;
+    diff = chrono::system_clock::now() - time_a;
+    cout << "Time used: " << diff.count() << endl;
+    time_a = chrono::system_clock::now();
 }
