@@ -24,7 +24,7 @@ int main(int argc, char *argv[] )
 {
     chrono::duration<double> diff;
     auto stage0 = chrono::system_clock::now();
-    sqrt_decimal("2", 10);
+    sqrt_decimal("2", 10000);
     auto stage1 = chrono::system_clock::now();
     
     diff = stage1-stage0;
@@ -145,14 +145,16 @@ vector<int> vec_mp_single(const vector<int> &a, const vector<int> &b)
 // vec_minus 设 a.len > b.len
 vector<int> vec_minus(const vector<int> &a, const vector<int> &b)
 {
+    register const int* pa = a.data();
+    register const int* pb = b.data();
     static int ia; // iter
     const int base = 1000000;
     vector<int> c( a.size() );
     int t, cut=0, ib=b.size()-1, zero=0;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]) - (b[ib--]) + cut
-                    : (a[ia]) + cut;
+        t = ib >= 0 ? (pa[ia]) - (pb[ib--]) + cut
+                    : (pa[ia]) + cut;
         t < 0 ? t += base, cut = -1 : cut = 0;
         zero = t == 0 ? zero+1 : 0;  // 此判断须独立，t有可能+base后才为0
         c[ia] = t;
