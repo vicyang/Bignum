@@ -52,7 +52,7 @@ int main(int argc, char *argv[] )
 // 参数：向量引用、 前移的段数（也许需要考虑vec为0的情况）
 void shift( vector<ULL>& vec, int n ) 
 {
-    for (int i = 1; i <= n; i++) vec.push_back(0);
+    for (register int i = 1; i <= n; i++) vec.emplace_back(0);
 }
 
 // 假设 b.size() >= a.size()
