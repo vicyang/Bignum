@@ -11,8 +11,8 @@ using namespace std::chrono;
 typedef unsigned long long ULL;
 
 string vec2str( const vector<ULL> &vec );
-vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b, int abegin);
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b);
+int vec_accum(vector<ULL> &a, vector<ULL> &b, int bbegin);
 int vec_mp_single( const vector<ULL>& a, ULL b, vector<ULL>& c, ULL indent);
 void time_used(system_clock::time_point& time_a);
 
@@ -32,7 +32,7 @@ int main(int argc, char *argv[] )
 {
     system_clock::time_point start;
     vector<ULL> a{777, 0, 12345678};
-    vector<ULL> b{6, 99999999, 99999999};
+    vector<ULL> b{6, 0, 1, 99999999, 99999999};
     vector<ULL> c;
     check( a, b, "*" );
     c = BasecaseMultiply( a, b );
@@ -59,11 +59,12 @@ int main(int argc, char *argv[] )
 // 假设 b.size() >= a.size()
 vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
 {
+    //使用固定尺寸的容器
     vector<ULL> c(a.size() + b.size(), 0);
     vector<ULL> t(a.size() + b.size(), 0);
-    int tpos = 1, tbegin;
     register const ULL* pa = a.data();
     register const ULL* pb = b.data();
+    int tpos = 1, tbegin;
     int bi = b.size() - 1, indent = 1;
     //初始化C值，末尾offset为0
     vec_mp_single( a, pb[bi--], c, 0 );
@@ -71,9 +72,9 @@ vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
     {
         //如果对应的b==0则不计入
         if ( pb[bi] > 0 )
-        {
+        {   //参数：vector_a, int_b, vector_t, t的末尾offset；返回t的实际起始下标
             tbegin = vec_mp_single(a, pb[bi], t, tpos);
-            c = vec_plus(t, c, tbegin);
+            vec_accum(c, t, tbegin);
         }
         bi--, indent++, tpos++;
     }
@@ -97,24 +98,23 @@ int vec_mp_single( const vector<ULL>& a, ULL b, vector<ULL>& c, ULL indent)
     return ci+1;
 }
 
-// a.size() <= b.size()
-vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b, int abegin)
+// 在原来的基础上叠加数值
+int vec_accum(vector<ULL> &a, vector<ULL> &b, int bbegin)
 {
     static int ia; // iter
-    register const ULL* pa = a.data();
-    register const ULL* pb = b.data();
-    vector<ULL> c( a.size() );
-    register ULL* pc = c.data();
+    register ULL* pa = a.data();
+    register ULL* pb = b.data();
     ULL t, pool=0;
-    int ib=b.size()-1;
-    for (ia = a.size()-1; ia >= abegin; ia-- )
+    register int ib = b.size()-1;
+    for (ia = a.size()-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (pa[ia]) + (pb[ib--]) + pool
                     : (pa[ia]) + pool;
-        pc[ia] = t % BASE, pool = t/BASE;
+        pa[ia] = t % BASE, pool = t/BASE;
+        if ( pool == 0 and ib < bbegin ) break;
     }
-    if ( pool > 0ULL ) c.insert(c.begin(), pool);
-    return c;
+    if ( pool > 0ULL ) pa[ia] = pool;
+    return ia;
 }
 
 string vec2str( const vector<ULL> &vec )
