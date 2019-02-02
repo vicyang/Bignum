@@ -88,18 +88,21 @@ vector<ULL> BasecaseMultiply( const vector<ULL>& a, const vector<ULL>& b)
     return c;
 }
 
-// 测试vector作为参数
+// a.size() <= b.size()
 vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
 {
     static int ia; // iter
+    register const ULL* pa = a.data();
+    register const ULL* pb = b.data();
     vector<ULL> c( a.size() );
+    register ULL* pc = c.data();
     int t, pool=0, ib=b.size()-1;
     int v, r;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
-                    : (a[ia]) + pool;
-        c[ia] = t % BASE, pool = t/BASE;
+        t = ib >= 0 ? (pa[ia]) + (pb[ib--]) + pool
+                    : (pa[ia]) + pool;
+        pc[ia] = t % BASE, pool = t/BASE;
     }
     if ( pool > 0 ) c.insert(c.begin(), pool);
     return c;
