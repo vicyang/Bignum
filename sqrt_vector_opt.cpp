@@ -85,24 +85,9 @@ ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
 
 int main(int argc, char *argv[] ) 
 {
-    // check minus
     system_clock::time_point timestamp = chrono::system_clock::now();
-
-    vector<ULL> mp(2);
-    //int begin;
-    // begin = vec_mp_single( vector<ULL> {99999999}, vector<ULL> {9}, mp );
-    // cout << begin << endl;
-    // cout << vec2str( mp ) << endl;
-
-    // minus test
-    //vector<ULL> dt = vec_minus( vector<ULL> {67,1212640,0000000,00000000}, vector<ULL> {1,67121262,61967979,87902500}, 1 );
-    //cout << vec2str( dt ) << endl;
-
-    //cmp_test
-    cout << "cmp: " << vec_cmp( vector<ULL>{1,1}, vector<ULL>{9}, 1 ) << endl;    
-
     vector<ULL> num{2};
-    sqrt_decimal(num, 20000);
+    sqrt_decimal(num, 10000);
     time_used( timestamp );
     return 0;
 }
