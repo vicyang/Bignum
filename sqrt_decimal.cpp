@@ -12,16 +12,13 @@ typedef unsigned long long int ULL;
 const ULL BASE = 100000000;
 const ULL LEN = 8;
 
-string s_mp_single(const string& a, const string& b);
-string s_plus(const string& a, const string& b);
-string s_minus(const string& a, const string& b);
-int s_cmp(const string &a, const string &b );
 string sqrt_decimal(vector<ULL> num, int precision);
 
 vector<ULL> vec_mp_single(const vector<ULL> &a, const vector<ULL> &b);
-vector<int> vec_minus(const vector<int> &a, const vector<int> &b);
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
+vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b);
 string vec2str( const vector<ULL> &vec );
-void check(const vector<int> &va, const vector<int> &vb, const string &op);
+void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op);
 
 // 牛顿迭代法求第一段
 ULL SqrtInt_ULL(ULL m)
@@ -48,7 +45,7 @@ int vec_cmp(vector<ULL> &a, vector<ULL> &b)
     return 0;
 }
 
-ULL BinSearch(vector<ULL> target, vector<ULL> base)
+ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
 {
     vector<ULL> tbase = base;
     tbase.push_back(0);
@@ -59,47 +56,84 @@ ULL BinSearch(vector<ULL> target, vector<ULL> base)
     do {
         tbase[ tblast ] = mid;
         v = vec_mp_single( tbase, vector<ULL> {mid} );
-        cout << vec2str(v) << endl;
+        //cout << vec2str(v) << endl;
              if ( vec_cmp(v, target) == 1 ) { max = mid; mid = (max+min)/2; } 
         else if ( vec_cmp(v, target) ==-1 ) { min = mid; mid = (max+min)/2; }
         else { break; }
         //printf("v: %ld mid: %ld, min: %ld, max: %ld\n", v, mid, min, max );
     } while ( max-min > 1 );
+
+    tbase[ tblast ] = mid;
+    // 更新 target 值
+    v = vec_mp_single( tbase, vector<ULL> {mid} );
+    target = vec_minus( target, v );
+    cout << "est v:   " << vec2str(v) << endl;
+    cout << "remainder:" << vec2str(target) << endl;
+
+    // 更新 base 值
+    ULL carry = mid*2 / BASE;
+    if (carry > 0) base[ base.size()-1 ] ++;
+    base.push_back( (mid*2) % BASE );
     return mid;
 }
 
 int main(int argc, char *argv[] ) 
 {
-    chrono::duration<double> diff;
-    auto stage0 = chrono::system_clock::now();
+    // check minus
+    vector<ULL> a{1,0,0};
+    vector<ULL> b{99999999, 32878736};
+    cout << vec2str(vec_minus(a, b)) << endl;
 
     vector<ULL> num{2};
     sqrt_decimal(num, 100);
-    auto stage1 = chrono::system_clock::now();
     
-    diff = stage1-stage0;
-    cout << "Time Used: " << diff.count() << " s" << endl;
     return 0;
 }
 
 string sqrt_decimal(vector<ULL> num, int precision)
 {
     bool dec_loop = 1;
-    int prec = 0, est, mp, mid, cmp, dbmid;
+    int prec = 0, mp, mid, cmp, dbmid;
 
     // 求出第一段
     ULL r_int;
     r_int = SqrtInt_ULL( num[0] );
-    cout << r_int;
+    cout << r_int << endl;
     
-    vector<ULL> base{2};
-    vector<ULL> target{1, 0, 0};
+    ULL est;
+    vector<ULL> result{ r_int };
+    vector<ULL> tnum = num;
+    vector<ULL> base{ r_int * 2 };
+    vector<ULL> target;
 
-    cout << BinSearch( target, base ) << endl;
+    // 求下一段 target
+    target = vec_minus( tnum, vector<ULL>{ r_int * r_int } );
+    target.push_back(0);
+    target.push_back(0);
+    cout << "target: " << vec2str(target) << endl;
+
+    // 求下一段结果，同时更新 target
+    est = BinSearch( target, base );
+    target.push_back(0);
+    target.push_back(0);
+    cout << "est: " << est << endl;
+    cout << "target: " << vec2str(target) << endl;
+    cout << "  base: " << vec2str(base) << endl;
+
+    // 求下一段结果，同时更新 target
+    est = BinSearch( target, base );
+    target.push_back(0);
+    target.push_back(0);
+    cout << "est: " << est << endl;
+    cout << "target: " << vec2str(target) << endl;
+    cout << "  base: " << vec2str(base) << endl;
 
     // while (prec++ < 10)
     // {
-    //     BinSearch( target, base );
+    //     target.push_back(0);
+    //     target.push_back(0);
+    //     est = BinSearch( target, base );
+    //     cout << est;
     // }
 
     cout << endl;
@@ -123,12 +157,30 @@ vector<ULL> vec_mp_single(const vector<ULL> &a, const vector<ULL> &b)
     return c;
 }
 
-// vec_minus 设 a.len > b.len
-vector<int> vec_minus(const vector<int> &a, const vector<int> &b)
+vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
 {
     static int ia; // iter
-    vector<int> c( a.size() );
-    int t, cut=0, ib=b.size()-1, zero=0;
+    vector<ULL> c( a.size() );
+    int t, pool=0, ib=b.size()-1;
+    int v, r;
+    for (ia = a.size()-1; ia >= 0; ia-- )
+    {
+        t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
+                    : (a[ia]) + pool;
+        c[ia] = t % BASE, pool = t/BASE;
+    }
+    if ( pool > 0 ) c.insert(c.begin(), pool);
+    return c;
+}
+
+// vec_minus 设 a.len > b.len
+vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b)
+{
+    register int ia;
+    register int ib = b.size()-1;
+    vector<ULL> c( a.size() );
+    ULL cut=0, zero=0;
+    long long int t; // t可能为负数
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (a[ia]) - (b[ib--]) + cut
@@ -157,51 +209,4 @@ void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
     string cmd = "perl -Mbignum -e \"print " + a + op + b + "\"";
     system( cmd.c_str() );
     cout << " <- check " << endl;
-}
-
-// bignum * single num (str*str)
-string s_mp_single(const string& a, const string& b)
-{
-    static int idx;
-    string s;
-    //如果b是0，直接返回0
-    if ( b[0] == '0' ) return "0";
-    if ( b[0] == '1' ) return a;
-    s.assign(a.length(), '0');
-    int t, pool = 0, numb = b[0]-'0';
-    for ( idx = a.length()-1; idx >= 0; idx-- )
-    {
-        t = (a[idx]-'0') * numb + pool;
-        s[idx] = t%10 + '0', pool = t/10;
-    }
-    if ( pool > 0 ) s.insert(0, 1, pool+'0');
-    return s;
-}
-
-// 大数减法 字符串操作, 暂时假设 a >= b
-string s_minus(const string& a, const string& b)
-{
-    const char* pa = a.data();
-    const char* pb = b.data();
-    static int ia;
-    if ( a.compare(b) == 0 ) return "0";
-    string s( a.length(), '0');
-    int t, v, cut=0, ib=b.length()-1, zero=0;
-    for (ia = a.length()-1; ia >= 0; ia-- )
-    {
-        t = ib >= 0 ? (pa[ia]-'0') - (pb[ib--]-'0') - cut 
-                    : (pa[ia]-'0') - cut;
-        cut = t < 0 ? 1 : 0;
-        v = t + '0' + cut*10, s[ia] = v;
-        v == '0' ? zero++ : zero=0;
-    }
-    if (zero > 0) s.erase(0, zero);
-    return s;
-}
-
-int s_cmp(const string &a, const string &b )
-{
-    if ( a.length() > b.length() ) return 1;
-    else if ( a.length() < b.length() ) return -1;
-    else return a.compare(b);
 }
