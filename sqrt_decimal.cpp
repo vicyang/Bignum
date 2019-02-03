@@ -35,14 +35,16 @@ ULL SqrtInt_ULL(ULL m)
 
 int vec_cmp(vector<ULL> &a, vector<ULL> &b)
 {
+    register ULL* pa = a.data();
+    register ULL* pb = b.data();
     int len_a = a.size(), len_b= b.size();
     if ( len_a > len_b ) { return 1; }
     else if ( len_a < len_b ) { return -1; }
 
     register int it = 0;
     for ( ; it < len_a; it++ ) {
-             if ( a[it] > b[it] ) { return 1; }
-        else if ( a[it] < b[it] ) { return -1; }
+             if ( pa[it] > pb[it] ) { return 1; }
+        else if ( pa[it] < pb[it] ) { return -1; }
     }
     return 0;
 }
@@ -92,7 +94,7 @@ int main(int argc, char *argv[] )
 string sqrt_decimal(vector<ULL> num, int precision)
 {
     bool dec_loop = 1;
-    int prec = 0, mp, mid, cmp, dbmid;
+    int prec = 0;
 
     // 求出第一段
     ULL r_int;
@@ -131,15 +133,18 @@ string sqrt_decimal(vector<ULL> num, int precision)
 // vec multiply to one word
 vector<ULL> vec_mp_single(const vector<ULL> &a, const vector<ULL> &b)
 {
+    register const ULL *pa = a.data();
+    register const ULL *pb = b.data();
     static int ia; // iter
     //如果b是0，直接返回0
     if ( b[0] == 0 ) return vector<ULL>{0};
     vector<ULL> c( a.size() );
+    register ULL *pc = c.data();
     ULL t, pool=0, ib=b.size()-1;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = a[ia] * b[0] + pool;
-        c[ia] = t%BASE, pool = t/BASE;
+        t = pa[ia] * pb[0] + pool;
+        pc[ia] = t%BASE, pool = t/BASE;
     }
     if ( pool > 0 ) c.insert(c.begin(), pool);
     return c;
@@ -149,13 +154,16 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b)
 {
     static int ia; // iter
     vector<ULL> c( a.size() );
+    register const ULL *pa = a.data();
+    register const ULL *pb = b.data();
+    register ULL *pc = c.data();
     int t, pool=0, ib=b.size()-1;
     int v, r;
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]) + (b[ib--]) + pool
-                    : (a[ia]) + pool;
-        c[ia] = t % BASE, pool = t/BASE;
+        t = ib >= 0 ? (pa[ia]) + (pb[ib--]) + pool
+                    : (pa[ia]) + pool;
+        pc[ia] = t % BASE, pool = t/BASE;
     }
     if ( pool > 0 ) c.insert(c.begin(), pool);
     return c;
