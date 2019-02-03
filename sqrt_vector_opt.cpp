@@ -31,10 +31,10 @@ ULL SqrtInt_ULL(ULL m)
     return s;
 }
 
-int vec_cmp(vector<ULL> &a, vector<ULL> &b, int abegin)
+int vec_cmp(const vector<ULL> &a, const vector<ULL> &b, int abegin)
 {
-    register ULL* pa = a.data();
-    register ULL* pb = b.data();
+    register const ULL* pa = a.data();
+    register const ULL* pb = b.data();
     int len_a = a.size() - abegin, len_b= b.size();
     if ( len_a > len_b ) { return 1; }
     else if ( len_a < len_b ) { return -1; }
@@ -68,9 +68,12 @@ ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
 
     tbase[ tblast ] = mid;
     // 更新 target 值
+    //cout << endl;
+    //cout << "target: " << vec2str(target) << endl;
     mp_begin = vec_mp_single( tbase, vector<ULL> {mid}, mp );
     target = vec_minus( target, mp, mp_begin );
-    // cout << "est v:   " << vec2str(v) << endl;
+    // cout << "tbase: " << vec2str(tbase) << ", mid " << mid << endl;
+    // cout << "mpbgn: " << mp_begin << ", est mp:   " << vec2str(mp) << endl;
     // cout << "remainder:" << vec2str(target) << endl;
 
     // 更新 base 值
@@ -92,11 +95,14 @@ int main(int argc, char *argv[] )
     // cout << vec2str( mp ) << endl;
 
     // minus test
-    vector<ULL> dt = vec_minus( vector<ULL> {99999999, 999}, vector<ULL> {1}, 1 );
-    cout << vec2str( dt ) << endl;
+    //vector<ULL> dt = vec_minus( vector<ULL> {67,1212640,0000000,00000000}, vector<ULL> {1,67121262,61967979,87902500}, 1 );
+    //cout << vec2str( dt ) << endl;
+
+    //cmp_test
+    cout << "cmp: " << vec_cmp( vector<ULL>{1,1}, vector<ULL>{9}, 1 ) << endl;    
 
     vector<ULL> num{2};
-    sqrt_decimal(num, 10000);
+    sqrt_decimal(num, 20000);
     time_used( timestamp );
     return 0;
 }
@@ -130,7 +136,7 @@ string sqrt_decimal(vector<ULL> num, int precision)
         est = BinSearch( target, base );
         target.push_back(0);
         target.push_back(0);
-        cout << est;
+        cout << to_string(est+BASE).substr(1, LEN);
         // cout << "target: " << vec2str(target) << endl;
         // cout << "  base: " << vec2str(base) << endl;
         prec += 8;
@@ -158,28 +164,28 @@ int vec_mp_single(const vector<ULL> &a, const vector<ULL> &b, vector<ULL> &c)
         t = pa[ia] * pb[0] + pool;
         pc[ic--] = t%BASE, pool = t/BASE;
     }
-    if ( pool > 0 ) { c[ic--] = pool; }
+    if ( pool > 0 ) { pc[ic--] = pool; }
     return ic+1;
 }
 
 // vec_minus 设 a.len > b.len
-vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b, int abegin)
+vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b, int bbegin)
 {
     register int ia = a.size()-1;
     register int ib = b.size()-1;
-    vector<ULL> c( a.size() - abegin );
+    vector<ULL> c( a.size() );
     register const ULL *pa = a.data();
     register const ULL *pb = b.data();
     register ULL *pc = c.data();
     int cut=0, zero=0;
     long long int t; // t可能为负数
-    for ( ; ia >= abegin; ia-- )
+    for ( ; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (pa[ia]) - (pb[ib--]) + cut
-                    : (pa[ia]) + cut;
+        t = ib >= bbegin ? (pa[ia]) - (pb[ib--]) + cut
+                         : (pa[ia]) + cut;
         t < 0 ? t += BASE, cut = -1 : cut = 0;
         zero = t == 0 ? zero+1 : 0;  // 此判断须独立，t有可能+base后才为0
-        pc[ia-abegin] = t;
+        pc[ ia ] = t;
     }
     if (zero > 0) c.erase(c.begin(), c.begin()+zero);
     return c;
