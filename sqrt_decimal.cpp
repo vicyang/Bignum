@@ -120,7 +120,7 @@ string sqrt_decimal(vector<ULL> num, int precision)
         est = BinSearch( target, base );
         target.push_back(0);
         target.push_back(0);
-        cout << est;
+        cout << to_string(est+BASE).substr(1, LEN);
         // cout << "target: " << vec2str(target) << endl;
         // cout << "  base: " << vec2str(base) << endl;
         prec += 8;
