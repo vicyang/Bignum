@@ -8,6 +8,7 @@
 #include <vector>
 #include <chrono>
 using namespace std;
+using namespace std::chrono;
 typedef unsigned long long int ULL;
 const ULL BASE = 100000000;
 const ULL LEN = 8;
@@ -19,6 +20,7 @@ vector<ULL> vec_plus(const vector<ULL> &a, const vector<ULL> &b);
 vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b);
 string vec2str( const vector<ULL> &vec );
 void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op);
+void time_used(system_clock::time_point& time_a);
 
 // 牛顿迭代法求第一段
 ULL SqrtInt_ULL(ULL m)
@@ -67,8 +69,8 @@ ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
     // 更新 target 值
     v = vec_mp_single( tbase, vector<ULL> {mid} );
     target = vec_minus( target, v );
-    cout << "est v:   " << vec2str(v) << endl;
-    cout << "remainder:" << vec2str(target) << endl;
+    // cout << "est v:   " << vec2str(v) << endl;
+    // cout << "remainder:" << vec2str(target) << endl;
 
     // 更新 base 值
     ULL carry = mid*2 / BASE;
@@ -80,13 +82,10 @@ ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
 int main(int argc, char *argv[] ) 
 {
     // check minus
-    vector<ULL> a{1,0,0};
-    vector<ULL> b{99999999, 32878736};
-    cout << vec2str(vec_minus(a, b)) << endl;
-
+    system_clock::time_point timestamp = chrono::system_clock::now();
     vector<ULL> num{2};
-    sqrt_decimal(num, 100);
-    
+    sqrt_decimal(num, 10000);
+    time_used( timestamp );
     return 0;
 }
 
@@ -98,7 +97,8 @@ string sqrt_decimal(vector<ULL> num, int precision)
     // 求出第一段
     ULL r_int;
     r_int = SqrtInt_ULL( num[0] );
-    cout << r_int << endl;
+    //cout << r_int << endl;
+    cout << r_int;
     
     ULL est;
     vector<ULL> result{ r_int };
@@ -110,31 +110,19 @@ string sqrt_decimal(vector<ULL> num, int precision)
     target = vec_minus( tnum, vector<ULL>{ r_int * r_int } );
     target.push_back(0);
     target.push_back(0);
-    cout << "target: " << vec2str(target) << endl;
+    //cout << "target: " << vec2str(target) << endl;
 
-    // 求下一段结果，同时更新 target
-    est = BinSearch( target, base );
-    target.push_back(0);
-    target.push_back(0);
-    cout << "est: " << est << endl;
-    cout << "target: " << vec2str(target) << endl;
-    cout << "  base: " << vec2str(base) << endl;
-
-    // 求下一段结果，同时更新 target
-    est = BinSearch( target, base );
-    target.push_back(0);
-    target.push_back(0);
-    cout << "est: " << est << endl;
-    cout << "target: " << vec2str(target) << endl;
-    cout << "  base: " << vec2str(base) << endl;
-
-    // while (prec++ < 10)
-    // {
-    //     target.push_back(0);
-    //     target.push_back(0);
-    //     est = BinSearch( target, base );
-    //     cout << est;
-    // }
+    while ( prec < precision )
+    {
+        // 求下一段结果，同时更新 target
+        est = BinSearch( target, base );
+        target.push_back(0);
+        target.push_back(0);
+        cout << est;
+        // cout << "target: " << vec2str(target) << endl;
+        // cout << "  base: " << vec2str(base) << endl;
+        prec += 8;
+    }
 
     cout << endl;
     return "";
@@ -179,15 +167,18 @@ vector<ULL> vec_minus(const vector<ULL> &a, const vector<ULL> &b)
     register int ia;
     register int ib = b.size()-1;
     vector<ULL> c( a.size() );
-    ULL cut=0, zero=0;
+    register const ULL *pa = a.data();
+    register const ULL *pb = b.data();
+    register ULL *pc = c.data();
+    int cut=0, zero=0;
     long long int t; // t可能为负数
     for (ia = a.size()-1; ia >= 0; ia-- )
     {
-        t = ib >= 0 ? (a[ia]) - (b[ib--]) + cut
-                    : (a[ia]) + cut;
+        t = ib >= 0 ? (pa[ia]) - (pb[ib--]) + cut
+                    : (pa[ia]) + cut;
         t < 0 ? t += BASE, cut = -1 : cut = 0;
         zero = t == 0 ? zero+1 : 0;  // 此判断须独立，t有可能+base后才为0
-        c[ia] = t;
+        pc[ia] = t;
     }
     c.erase(c.begin(), c.begin()+zero);
     return c;
@@ -209,4 +200,11 @@ void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
     string cmd = "perl -Mbignum -e \"print " + a + op + b + "\"";
     system( cmd.c_str() );
     cout << " <- check " << endl;
+}
+
+void time_used(system_clock::time_point& time_a) {
+    duration<double> diff;
+    diff = chrono::system_clock::now() - time_a;
+    cout << "Time used: " << diff.count() << endl;
+    time_a = chrono::system_clock::now();
 }
