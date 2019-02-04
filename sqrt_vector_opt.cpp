@@ -48,6 +48,13 @@ int vec_cmp(const vector<ULL> &a, const vector<ULL> &b, int abegin)
     return 0;
 }
 
+void print_vec( vector<ULL> &vec )
+{
+    for (ULL n : vec)
+        cout << to_string( BASE+n ).substr(1,LEN) << " ";
+    cout << endl;
+}
+
 ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
 {
     vector<ULL> tbase = base;
@@ -55,17 +62,30 @@ ULL BinSearch(vector<ULL> &target, vector<ULL> &base)
     ULL min = 0, max = BASE, mid = (min+max)/2;
     int tblast = tbase.size()-1;
     int mp_begin;
-
     vector<ULL> mp( tbase.size() + 1);
-    do {
-        tbase[ tblast ] = mid;
-        mp_begin = vec_mp_single( tbase, vector<ULL> {mid}, mp );
-        //cout << vec2str(v) << endl;
-             if ( vec_cmp(mp, target, mp_begin) == 1 ) { max = mid; mid = (max+min)/2; } 
-        else if ( vec_cmp(mp, target, mp_begin) ==-1 ) { min = mid; mid = (max+min)/2; }
-        else { break; }
-        //printf("v: %ld mid: %ld, min: %ld, max: %ld\n", v, mid, min, max );
-    } while ( max-min > 1 );
+
+    //预估 mid 值
+    if (tblast > 2)
+    {
+        mid = (target[0]*BASE*BASE + target[1]*BASE + target[2])/(base[0]*BASE + base[1] );
+        max = mid+100;
+    }
+    // else {
+        do {
+            tbase[ tblast ] = mid;
+            mp_begin = vec_mp_single( tbase, vector<ULL> {mid}, mp );
+            //cout << vec2str(v) << endl;
+                 if ( vec_cmp(mp, target, mp_begin) == 1 ) { max = mid; mid = (max+min)/2; } 
+            else if ( vec_cmp(mp, target, mp_begin) ==-1 ) { min = mid; mid = (max+min)/2; }
+            else { break; }
+            //printf("v: %ld mid: %ld, min: %ld, max: %ld\n", v, mid, min, max );
+        } while ( max-min > 1 );
+    // }
+
+    // cout << endl;
+    // print_vec( target );
+    // print_vec( base );
+    // //cout << mid << endl;
 
     tbase[ tblast ] = mid;
     // 更新 target 值
@@ -125,7 +145,7 @@ string sqrt_decimal(vector<ULL> num, int precision)
         cout << to_string(est+BASE).substr(1, LEN);
         // cout << "target: " << vec2str(target) << endl;
         // cout << "  base: " << vec2str(base) << endl;
-        prec += 8;
+        prec += LEN;
     }
 
     cout << endl;
@@ -140,7 +160,7 @@ int vec_mp_single(const vector<ULL> &a, const vector<ULL> &b, vector<ULL> &c)
     register ULL *pc = c.data();
     register int ia = a.size()-1, ic = c.size()-1;
     //如果b是0，直接返回0
-    if ( b[0] == 0 ) {
+    if ( pb[0] == 0 ) {
         pc[ic] = 0;
         return ic;
     }
