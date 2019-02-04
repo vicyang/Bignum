@@ -1,6 +1,7 @@
-// SQRT - Decimal Solution, C++ implementation (Only for Positive Integer Number)
+// SQRT - Paper and Pencil method, C++ implementation (Only for Positive Integer Number)
 // 523066680/vicyang
-// 2019-02 Vector
+// 2019-02
+// vector solution, BASE = 10^8, not finished yet :P
 
 #include <cstdio>
 #include <iostream>
