@@ -31,7 +31,7 @@ sub BasecaseDivRem
     if ( $A >= $BASE**$m*$B ) { $q[$m] = 1; $A -= ($BASE**$m) * $B; }
     else { $q[$m] = 0; }
 
-    printf "A: %s\n", $A;
+    printf "A: %s, B: %s\n", $A, $B;
     my $j;
     @Ar = reverse split("", $A);
     for ($j = $m-1; $j >= 0; $j--)
