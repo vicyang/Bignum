@@ -1,6 +1,7 @@
-// bignum minus
+// bignum minus signed
+// 需要考虑传入参数已经是负数的情况、vec_cmp亦需要做相应判断
 // 523066680/vicyang
-// 2019-01
+// 2019-02
 
 #include <iostream>
 #include <chrono>
@@ -8,12 +9,14 @@
 #include <cstdio>
 using namespace std;
 typedef long long int LL;
+typedef unsigned long long int ULL;
 const LL BASE = 100000000;
 const LL LEN = 8;
 
 vector<LL> vec_minus(const vector<LL> &a, const vector<LL> &b);
 string s_minus(const string &a, const string &b);
 string vec2str( const vector<LL> &vec );
+int vec_cmp(const vector<LL> &a, const vector<LL> &b);
 
 void check(const vector<LL> &va, const vector<LL> &vb)
 {
@@ -33,13 +36,13 @@ int main(int argc, char *argv[] )
     // 小范围的"向量"减法测试
     vector<LL> va{552, 443, 12345678, 87654321};
     vector<LL> vb{ 93456, 92432100};
-    //check(va, vb);
+    check(va, vb);
     vector<LL> vc = vec_minus(va,vb);
     cout << vec2str(vc) << endl;
 
     // 结果应为1的测试
-    va = {1, 0, 0};
-    vb = {99999999,99999999};
+    vb = {1, 0, 0};
+    va = {99999999,99999999};
     //check(va, vb);
     vc = vec_minus(va, vb);
     cout << vec2str(vc) << endl;
@@ -50,16 +53,27 @@ int main(int argc, char *argv[] )
     return 0;
 }
 
-// 测试vector作为参数
+//带符号的减法（为完善）
 vector<LL> vec_minus(const vector<LL> &a, const vector<LL> &b)
 {
-    static int ia; // iter
-    register const LL *pa = a.data();
-    register const LL *pb = b.data();
-    vector<LL> c( a.size() );
+    static int ia, asize, bsize; 
+    LL sign = 1;
+    register const LL *pa, *pb;
+    vector<LL> c;
+    //如果 a < b，指针调换，sign 为 -1
+    if ( vec_cmp(a, b) == -1 ) {
+        c.assign(b.size(), 0);
+        pa = b.data(), pb = a.data(), sign = -1;
+        asize = b.size(), bsize = a.size();
+    } else {
+        c.assign(a.size(), 0);
+        pa = a.data(), pb = b.data();
+        asize = a.size(), bsize = b.size();
+    }
+    
     register LL *pc = c.data();
-    LL t, cut=0, ib=b.size()-1, zero=0;
-    for (ia = a.size()-1; ia >= 0; ia-- )
+    LL t, cut=0, ib=bsize-1, zero=0;
+    for (ia = asize-1; ia >= 0; ia-- )
     {
         t = ib >= 0 ? (pa[ia]) - (pb[ib--]) + cut
                     : (pa[ia]) + cut;
@@ -68,6 +82,7 @@ vector<LL> vec_minus(const vector<LL> &a, const vector<LL> &b)
         pc[ia] = t;
     }
     c.erase(c.begin(), c.begin()+zero);
+    c[0] *= sign;
     return c;
 }
 
@@ -78,4 +93,19 @@ string vec2str( const vector<LL> &vec )
     for ( int it = 1; it < vec.size(); it++ )
         s += to_string(vec[it]+BASE ).substr(1, LEN);
     return s;
+}
+
+int vec_cmp(const vector<LL> &a, const vector<LL> &b)
+{
+    register const LL* pa = a.data();
+    register const LL* pb = b.data();
+    int len_a = a.size(), len_b= b.size();
+    if ( len_a > len_b ) { return 1; }
+    else if ( len_a < len_b ) { return -1; }
+    register int it = 0;
+    for ( ; it < len_a; it++ ) {
+             if ( pa[it] > pb[it] ) { return 1; }
+        else if ( pa[it] < pb[it] ) { return -1; }
+    }
+    return 0;
 }
