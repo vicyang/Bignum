@@ -53,12 +53,23 @@ vector<ULL> BasecaseDivRem( const vector<ULL> &a, const vector<ULL> &b )
         q[m] = 0;
     }
 
-    int tq;
+    ULL tq;
+    vector<ULL> tv;
     for ( int j = m-1; j >= 0; j-- )
     {
-        tq = int( ta[asize-(n+j)] );
+        tq = (ta[asize-(n+j)-1] + ta[asize-(n+j)])/tb[0];
+        q[j] = tq < BASE - 1 ? tq : BASE - 1;
+        // ta = vec_minus(ta, tb);
+        tv = vec_mp_single(b, vector<ULL>{q[j]} );
+        shift(tv, j);
+        ta = vec_minus( ta, tv );
+        
+
+        cout << vec2str(ta) << "," << q[j] << endl;
+        //cout << ta[asize-(n+j)-1] << ",";
     }
 
+    cout << endl;
     return vector<ULL>{0};
 }
 
