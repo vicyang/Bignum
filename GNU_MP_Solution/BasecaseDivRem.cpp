@@ -22,7 +22,7 @@ int vec_accum(vector<LL> &a, vector<LL> &b, int bbegin);
 
 void time_used(system_clock::time_point& time_a);
 
-const LL BASE = 100000000;
+const LL BASE = 1e8;
 const int MAXLEN = 8;
 
 void check(const vector<LL> &va, const vector<LL> &vb, const string &op)

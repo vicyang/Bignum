@@ -10,7 +10,7 @@
 using namespace std;
 using namespace std::chrono;
 typedef unsigned long long int ULL;
-const ULL BASE = 100000000;
+const ULL BASE = 1e8;
 const ULL LEN = 8;
 
 string sqrt_decimal(vector<ULL> num, int precision);

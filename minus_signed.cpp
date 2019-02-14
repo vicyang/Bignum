@@ -10,7 +10,7 @@
 using namespace std;
 typedef long long int LL;
 typedef unsigned long long int ULL;
-const LL BASE = 100000000;
+const LL BASE = 1e8;
 const LL LEN = 8;
 
 vector<LL> vec_minus(const vector<LL> &a, const vector<LL> &b);

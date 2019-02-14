@@ -16,7 +16,7 @@ int vec_accum(vector<ULL> &a, vector<ULL> &b, int bbegin);
 int vec_mp_single( const vector<ULL>& a, ULL b, vector<ULL>& c, ULL indent);
 void time_used(system_clock::time_point& time_a);
 
-const ULL BASE = 100000000;
+const ULL BASE = 1e8;
 const int MAXLEN = 8;
 
 void check(const vector<ULL> &va, const vector<ULL> &vb, const string &op)
